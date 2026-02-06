@@ -119,16 +119,8 @@ def get_database_config():
         config = dj_database_url.parse(
             database_url,
             conn_max_age=600,
+            ssl_require=True,  # This handles SSL properly for Railway
         )
-        
-        # Add SSL mode for Railway PostgreSQL (required for connections)
-        # Railway requires SSL for external connections
-        if 'OPTIONS' not in config:
-            config['OPTIONS'] = {}
-        
-        # Handle sslmode properly for psycopg2
-        # Railway requires SSL but we need to pass it correctly
-        config['OPTIONS']['sslmode'] = 'require'
         
         return config
     else:
