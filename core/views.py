@@ -18,12 +18,14 @@ def get_daily_content():
     today = datetime.now()
     date_seed = today.strftime('%Y%m%d')
     
+    # Calculate hash value once for consistent daily selection
+    hash_val = int(hashlib.md5(date_seed.encode()).hexdigest(), 16)
+    
     # Get all active thoughts
     thoughts = list(DailyThought.objects.filter(is_active=True))
     
     if thoughts:
         # Use date-based hash for consistent daily selection
-        hash_val = int(hashlib.md5(date_seed.encode()).hexdigest(), 16)
         thought = thoughts[hash_val % len(thoughts)]
     else:
         # Default thoughts if none in database (25 quotes for variety)
