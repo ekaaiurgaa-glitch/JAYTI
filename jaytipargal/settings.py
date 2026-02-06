@@ -21,7 +21,28 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'jayti-pargal-personal-companion-2026-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+# Allowed hosts - handles Railway's dynamic hostnames
+# Railway sets its own hostname dynamically, so we need to allow all Railway domains
+_default_hosts = 'localhost,127.0.0.1'
+ALLOWED_HOSTS_ENV = os.environ.get('ALLOWED_HOSTS', _default_hosts)
+ALLOWED_HOSTS = [h.strip() for h in ALLOWED_HOSTS_ENV.split(',') if h.strip()]
+
+# Add Railway domain pattern if not in DEBUG mode
+# Railway domains follow pattern: *.up.railway.app
+if not DEBUG:
+    # Ensure we have the Railway domain pattern
+    railway_domains = ['.up.railway.app', '*.up.railway.app']
+    for domain in railway_domains:
+        if domain not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(domain)
+    
+    # Also add any RAILWAY_STATIC_URL domain if present
+    railway_static_url = os.environ.get('RAILWAY_STATIC_URL', '')
+    if railway_static_url:
+        from urllib.parse import urlparse
+        parsed = urlparse(railway_static_url)
+        if parsed.hostname and parsed.hostname not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(parsed.hostname)
 
 # Application definition
 INSTALLED_APPS = [
@@ -75,12 +96,42 @@ WSGI_APPLICATION = 'jaytipargal.wsgi.application'
 
 # Database Configuration
 # Uses PostgreSQL in production (via DATABASE_URL), SQLite for local development
+# Railway deployment: DATABASE_URL is auto-injected when PostgreSQL is provisioned
+
+def get_database_config():
+    """
+    Get database configuration with proper SSL handling for Railway.
+    Returns a dict compatible with Django DATABASES setting.
+    """
+    database_url = os.environ.get('DATABASE_URL')
+    
+    if database_url:
+        # Production: Use PostgreSQL with Railway
+        # Parse the URL and handle SSL properly
+        config = dj_database_url.parse(
+            database_url,
+            conn_max_age=600,
+        )
+        
+        # Add SSL mode for Railway PostgreSQL (required for connections)
+        # Railway requires SSL for external connections
+        if 'OPTIONS' not in config:
+            config['OPTIONS'] = {}
+        
+        # Handle sslmode properly for psycopg2
+        # Railway requires SSL but we need to pass it correctly
+        config['OPTIONS']['sslmode'] = 'require'
+        
+        return config
+    else:
+        # Development: Use SQLite
+        return {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+
 DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
-        conn_max_age=600,
-        ssl_require=not DEBUG
-    )
+    'default': get_database_config()
 }
 
 # Password validation
