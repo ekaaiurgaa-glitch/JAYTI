@@ -1,436 +1,156 @@
 {% extends 'base.html' %}
 
-{% block title %}Goal Board - jayti{% endblock %}
+{% block title %}Goal Board - JaytiPargal.in{% endblock %}
 
 {% block extra_css %}
 <style>
-    .board-header {
-        background: linear-gradient(135deg, var(--lavender-mist) 0%, #D4D4F0 100%);
-        padding: 2rem 0;
-        margin-bottom: 2rem;
-    }
-    
-    .board-title {
-        color: var(--warm-charcoal);
-        font-size: 2rem;
-    }
-    
-    .board-subtitle {
-        color: var(--muted-mauve);
-        font-family: 'Dancing Script', cursive;
-        font-size: 1.3rem;
-    }
-    
-    .board-container {
-        overflow-x: auto;
-        padding-bottom: 1rem;
-    }
-    
-    .board-columns {
-        display: flex;
-        gap: 1.5rem;
-        min-width: 1200px;
-    }
-    
-    .board-column {
-        flex: 1;
-        min-width: 280px;
-        background: var(--cream);
-        border-radius: 20px;
-        padding: 1.5rem;
-    }
-    
-    .column-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 2px solid rgba(0,0,0,0.05);
-    }
-    
-    .column-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .column-count {
-        background: white;
-        padding: 0.25rem 0.75rem;
-        border-radius: 15px;
-        font-size: 0.85rem;
-        color: var(--muted-mauve);
-    }
-    
-    .column-pending .column-title { color: #666; }
-    .column-in_progress .column-title { color: #f0ad4e; }
-    .column-done .column-title { color: #5cb85c; }
-    .column-blocked .column-title { color: #d9534f; }
-    
-    .task-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.25rem;
-        margin-bottom: 1rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-    
-    .task-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    }
-    
-    .task-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: start;
-        margin-bottom: 0.75rem;
-    }
-    
-    .task-title {
-        font-weight: 600;
-        color: var(--warm-charcoal);
-        font-size: 0.95rem;
-        margin: 0;
-        line-height: 1.4;
-    }
-    
-    .task-goal {
-        font-size: 0.8rem;
-        color: var(--muted-mauve);
-        margin-bottom: 0.75rem;
-    }
-    
-    .task-goal a {
-        color: var(--dusty-rose);
-        text-decoration: none;
-    }
-    
-    .task-goal a:hover {
-        text-decoration: underline;
-    }
-    
-    .task-meta {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 0.8rem;
-        color: var(--muted-mauve);
-    }
-    
-    .task-department {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.3rem;
-        padding: 0.25rem 0.5rem;
-        background: var(--cream);
+    .kanban-column {
+        min-height: 400px;
+        background: rgba(244,194,194,0.1);
         border-radius: 8px;
+        padding: 1rem;
     }
-    
-    .task-due {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.3rem;
+    .kanban-card {
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
     }
-    
-    .task-due.overdue {
-        color: #dc3545;
-        font-weight: 600;
+    .kanban-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    
-    .empty-column {
-        text-align: center;
-        padding: 3rem 1rem;
-        color: var(--muted-mauve);
-    }
-    
-    .empty-column i {
-        font-size: 2rem;
-        margin-bottom: 0.75rem;
-        opacity: 0.5;
-    }
-    
-    .progress-bar-small {
-        height: 4px;
-        background: var(--cream);
-        border-radius: 2px;
-        margin-top: 0.75rem;
-        overflow: hidden;
-    }
-    
-    .progress-bar-small .progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, var(--blush-rose), var(--dusty-rose));
-        border-radius: 2px;
-        transition: width 0.3s ease;
-    }
-    
-    .view-toggle {
-        display: flex;
-        gap: 0.5rem;
-        background: white;
-        padding: 0.5rem;
-        border-radius: 25px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    }
-    
-    .view-btn {
-        padding: 0.5rem 1.25rem;
-        border-radius: 20px;
-        border: none;
-        background: transparent;
-        color: var(--muted-mauve);
-        font-weight: 500;
-        transition: all 0.3s ease;
-        text-decoration: none;
-    }
-    
-    .view-btn:hover {
-        color: var(--dusty-rose);
-    }
-    
-    .view-btn.active {
-        background: linear-gradient(135deg, var(--blush-rose), var(--dusty-rose));
-        color: white;
-    }
+    .status-pending { border-left: 4px solid #6c757d; }
+    .status-in_progress { border-left: 4px solid #0d6efd; }
+    .status-done { border-left: 4px solid #198754; }
+    .status-blocked { border-left: 4px solid #dc3545; }
+    .status-at_risk { border-left: 4px solid #ffc107; }
+    .status-overdue { border-left: 4px solid #dc3545; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="board-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <h1 class="board-title mb-1">
-                    <i class="fas fa-columns me-2"></i>Goal Board
-                </h1>
-                <p class="board-subtitle mb-0">Visualize your progress</p>
-            </div>
-            <div class="col-md-6 text-md-end mt-3 mt-md-0">
-                <div class="view-toggle d-inline-flex">
-                    <a href="{% url 'goal_list' %}" class="view-btn">
-                        <i class="fas fa-list me-1"></i>List
-                    </a>
-                    <a href="{% url 'goal_board' %}" class="view-btn active">
-                        <i class="fas fa-columns me-1"></i>Board
-                    </a>
-                </div>
-            </div>
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 style="color: var(--dusty-rose);"><i class="fas fa-columns me-2"></i>Goal Board</h2>
+            <p class="text-muted">Kanban view of all your tasks across goals.</p>
         </div>
-    </div>
-</div>
-
-<div class="container">
-    <div class="board-container">
-        <div class="board-columns">
-            <!-- Pending Column -->
-            <div class="board-column column-pending">
-                <div class="column-header">
-                    <span class="column-title">
-                        <i class="fas fa-clock me-2"></i>Pending
-                    </span>
-                    <span class="column-count">{{ tasks_pending|length }}</span>
-                </div>
-                {% if tasks_pending %}
-                    {% for task in tasks_pending %}
-                    <div class="task-card">
-                        <div class="task-header">
-                            <h6 class="task-title">{{ task.title }}</h6>
-                        </div>
-                        <p class="task-goal">
-                            <i class="fas fa-bullseye me-1"></i>
-                            <a href="{% url 'goal_detail' task.goal.pk %}">{{ task.goal.title|truncatewords:4 }}</a>
-                        </p>
-                        <div class="task-meta">
-                            <span class="task-department">
-                                <i class="fas fa-building"></i>
-                                {{ task.get_department_display }}
-                            </span>
-                            <span class="task-due {% if task.due_date < today %}overdue{% endif %}">
-                                <i class="fas fa-calendar"></i>
-                                {{ task.due_date|date:"M d" }}
-                            </span>
-                        </div>
-                        <a href="{% url 'task_update' task.pk %}" class="stretched-link"></a>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-column">
-                        <i class="fas fa-clipboard"></i>
-                        <p class="mb-0">No pending tasks</p>
-                    </div>
-                {% endif %}
-            </div>
-
-            <!-- In Progress Column -->
-            <div class="board-column column-in_progress">
-                <div class="column-header">
-                    <span class="column-title">
-                        <i class="fas fa-spinner me-2"></i>In Progress
-                    </span>
-                    <span class="column-count">{{ tasks_in_progress|length }}</span>
-                </div>
-                {% if tasks_in_progress %}
-                    {% for task in tasks_in_progress %}
-                    <div class="task-card">
-                        <div class="task-header">
-                            <h6 class="task-title">{{ task.title }}</h6>
-                        </div>
-                        <p class="task-goal">
-                            <i class="fas fa-bullseye me-1"></i>
-                            <a href="{% url 'goal_detail' task.goal.pk %}">{{ task.goal.title|truncatewords:4 }}</a>
-                        </p>
-                        <div class="task-meta">
-                            <span class="task-department">
-                                <i class="fas fa-building"></i>
-                                {{ task.get_department_display }}
-                            </span>
-                            <span class="task-due {% if task.due_date < today %}overdue{% endif %}">
-                                <i class="fas fa-calendar"></i>
-                                {{ task.due_date|date:"M d" }}
-                            </span>
-                        </div>
-                        <div class="progress-bar-small">
-                            <div class="progress-fill" style="width: {{ task.completion_percentage }}%"></div>
-                        </div>
-                        <a href="{% url 'task_update' task.pk %}" class="stretched-link"></a>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-column">
-                        <i class="fas fa-rocket"></i>
-                        <p class="mb-0">No tasks in progress</p>
-                    </div>
-                {% endif %}
-            </div>
-
-            <!-- Blocked Column -->
-            <div class="board-column column-blocked">
-                <div class="column-header">
-                    <span class="column-title">
-                        <i class="fas fa-ban me-2"></i>Blocked
-                    </span>
-                    <span class="column-count">{{ tasks_blocked|length }}</span>
-                </div>
-                {% if tasks_blocked %}
-                    {% for task in tasks_blocked %}
-                    <div class="task-card" style="border-left: 4px solid #d9534f;">
-                        <div class="task-header">
-                            <h6 class="task-title">{{ task.title }}</h6>
-                        </div>
-                        <p class="task-goal">
-                            <i class="fas fa-bullseye me-1"></i>
-                            <a href="{% url 'goal_detail' task.goal.pk %}">{{ task.goal.title|truncatewords:4 }}</a>
-                        </p>
-                        {% if task.blocked_reason %}
-                        <p class="small text-danger mb-2">
-                            <i class="fas fa-exclamation-circle me-1"></i>
-                            {{ task.blocked_reason|truncatewords:8 }}
-                        </p>
-                        {% endif %}
-                        <div class="task-meta">
-                            <span class="task-department">
-                                <i class="fas fa-building"></i>
-                                {{ task.get_department_display }}
-                            </span>
-                            <span class="task-due">
-                                <i class="fas fa-calendar"></i>
-                                {{ task.due_date|date:"M d" }}
-                            </span>
-                        </div>
-                        <a href="{% url 'task_update' task.pk %}" class="stretched-link"></a>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-column">
-                        <i class="fas fa-check-circle"></i>
-                        <p class="mb-0">No blocked tasks</p>
-                    </div>
-                {% endif %}
-            </div>
-
-            <!-- Done Column -->
-            <div class="board-column column-done">
-                <div class="column-header">
-                    <span class="column-title">
-                        <i class="fas fa-check-circle me-2"></i>Done
-                    </span>
-                    <span class="column-count">{{ tasks_done|length }}</span>
-                </div>
-                {% if tasks_done %}
-                    {% for task in tasks_done %}
-                    <div class="task-card" style="opacity: 0.7;">
-                        <div class="task-header">
-                            <h6 class="task-title" style="text-decoration: line-through;">{{ task.title }}</h6>
-                        </div>
-                        <p class="task-goal">
-                            <i class="fas fa-bullseye me-1"></i>
-                            <a href="{% url 'goal_detail' task.goal.pk %}">{{ task.goal.title|truncatewords:4 }}</a>
-                        </p>
-                        <div class="task-meta">
-                            <span class="task-department">
-                                <i class="fas fa-building"></i>
-                                {{ task.get_department_display }}
-                            </span>
-                            <span class="task-due" style="color: #5cb85c;">
-                                <i class="fas fa-check"></i>
-                                Done
-                            </span>
-                        </div>
-                        <a href="{% url 'task_update' task.pk %}" class="stretched-link"></a>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-column">
-                        <i class="fas fa-trophy"></i>
-                        <p class="mb-0">No completed tasks</p>
-                    </div>
-                {% endif %}
-            </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{% url 'goal_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-list me-2"></i>List View
+            </a>
         </div>
     </div>
 
-    <!-- Summary Stats -->
-    <div class="row mt-5">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title mb-4">
-                        <i class="fas fa-chart-pie me-2" style="color: var(--dusty-rose);"></i>
-                        Task Overview
-                    </h5>
-                    <div class="row text-center">
-                        <div class="col-6 col-md-3 mb-3">
-                            <div class="p-3 rounded" style="background: var(--cream);">
-                                <h3 class="mb-1" style="color: #666;">{{ tasks_pending|length }}</h3>
-                                <small class="text-muted">Pending</small>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3 mb-3">
-                            <div class="p-3 rounded" style="background: #fff8e1;">
-                                <h3 class="mb-1" style="color: #f0ad4e;">{{ tasks_in_progress|length }}</h3>
-                                <small class="text-muted">In Progress</small>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3 mb-3">
-                            <div class="p-3 rounded" style="background: #ffebee;">
-                                <h3 class="mb-1" style="color: #d9534f;">{{ tasks_blocked|length }}</h3>
-                                <small class="text-muted">Blocked</small>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3 mb-3">
-                            <div class="p-3 rounded" style="background: #e8f5e9;">
-                                <h3 class="mb-1" style="color: #5cb85c;">{{ tasks_done|length }}</h3>
-                                <small class="text-muted">Completed</small>
-                            </div>
+    <!-- Kanban Board -->
+    <div class="row">
+        <!-- Pending -->
+        <div class="col-md-4 col-lg-2 mb-3">
+            <h6 class="mb-2"><span class="badge bg-secondary">Pending</span></h6>
+            <div class="kanban-column">
+                {% for task in tasks_pending %}
+                <div class="card kanban-card mb-2 status-pending" onclick="window.location='{% url 'goal_detail' task.goal.pk %}'">
+                    <div class="card-body py-2">
+                        <p class="mb-1 small fw-bold">{{ task.title|truncatechars:40 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">{{ task.goal.title|truncatechars:15 }}</small>
+                            {% if task.due_date %}
+                            <small class="{% if task.due_date < today %}text-danger{% endif %}">{{ task.due_date|date:"M d" }}</small>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
+                {% empty %}
+                <p class="text-muted small text-center">No pending tasks</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- In Progress -->
+        <div class="col-md-4 col-lg-2 mb-3">
+            <h6 class="mb-2"><span class="badge bg-primary">In Progress</span></h6>
+            <div class="kanban-column">
+                {% for task in tasks_in_progress %}
+                <div class="card kanban-card mb-2 status-in_progress" onclick="window.location='{% url 'goal_detail' task.goal.pk %}'">
+                    <div class="card-body py-2">
+                        <p class="mb-1 small fw-bold">{{ task.title|truncatechars:40 }}</p>
+                        <div class="progress" style="height: 4px;">
+                            <div class="progress-bar" style="width: {{ task.completion_percentage }}%"></div>
+                        </div>
+                        <small class="text-muted">{{ task.goal.title|truncatechars:15 }}</small>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted small text-center">No tasks in progress</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Done -->
+        <div class="col-md-4 col-lg-2 mb-3">
+            <h6 class="mb-2"><span class="badge bg-success">Done</span></h6>
+            <div class="kanban-column">
+                {% for task in tasks_done %}
+                <div class="card kanban-card mb-2 status-done" onclick="window.location='{% url 'goal_detail' task.goal.pk %}'">
+                    <div class="card-body py-2">
+                        <p class="mb-1 small fw-bold text-decoration-line-through">{{ task.title|truncatechars:40 }}</p>
+                        <small class="text-muted">{{ task.goal.title|truncatechars:15 }}</small>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted small text-center">No completed tasks</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Blocked -->
+        <div class="col-md-4 col-lg-2 mb-3">
+            <h6 class="mb-2"><span class="badge bg-danger">Blocked</span></h6>
+            <div class="kanban-column">
+                {% for task in tasks_blocked %}
+                <div class="card kanban-card mb-2 status-blocked" onclick="window.location='{% url 'goal_detail' task.goal.pk %}'">
+                    <div class="card-body py-2">
+                        <p class="mb-1 small fw-bold">{{ task.title|truncatechars:40 }}</p>
+                        <small class="text-danger">{{ task.blocked_reason|truncatechars:30 }}</small>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted small text-center">No blocked tasks</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- At Risk -->
+        <div class="col-md-4 col-lg-2 mb-3">
+            <h6 class="mb-2"><span class="badge bg-warning text-dark">At Risk</span></h6>
+            <div class="kanban-column">
+                {% for task in tasks_at_risk %}
+                <div class="card kanban-card mb-2 status-at_risk" onclick="window.location='{% url 'goal_detail' task.goal.pk %}'">
+                    <div class="card-body py-2">
+                        <p class="mb-1 small fw-bold">{{ task.title|truncatechars:40 }}</p>
+                        <small class="text-muted">{{ task.goal.title|truncatechars:15 }}</small>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted small text-center">No at-risk tasks</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Overdue -->
+        <div class="col-md-4 col-lg-2 mb-3">
+            <h6 class="mb-2"><span class="badge bg-danger">Overdue</span></h6>
+            <div class="kanban-column">
+                {% for task in tasks_overdue %}
+                <div class="card kanban-card mb-2 status-overdue" onclick="window.location='{% url 'goal_detail' task.goal.pk %}'">
+                    <div class="card-body py-2">
+                        <p class="mb-1 small fw-bold">{{ task.title|truncatechars:40 }}</p>
+                        <small class="text-danger">Due {{ task.due_date|date:"M d" }}</small>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted small text-center">No overdue tasks</p>
+                {% endfor %}
             </div>
         </div>
     </div>

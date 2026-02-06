@@ -1,323 +1,77 @@
 {% extends 'base.html' %}
 
-{% block title %}Update Task - {{ task.title }} - jayti{% endblock %}
-
-{% block extra_css %}
-<style>
-    .form-header {
-        background: linear-gradient(135deg, var(--lavender-mist) 0%, #D4D4F0 100%);
-        padding: 2.5rem 0;
-        margin-bottom: 2rem;
-    }
-    
-    .form-header h1 {
-        color: var(--warm-charcoal);
-        font-size: 2rem;
-    }
-    
-    .form-header p {
-        color: var(--muted-mauve);
-        font-family: 'Dancing Script', cursive;
-        font-size: 1.3rem;
-    }
-    
-    .form-card {
-        background: white;
-        border-radius: 24px;
-        box-shadow: 0 8px 40px rgba(212,165,165,0.15);
-        padding: 2.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .form-label {
-        font-weight: 600;
-        color: var(--warm-charcoal);
-        margin-bottom: 0.5rem;
-    }
-    
-    .form-control, .form-select {
-        border: 2px solid rgba(244,194,194,0.4);
-        border-radius: 14px;
-        padding: 0.875rem 1.25rem;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        background: var(--cream);
-    }
-    
-    .form-control:focus, .form-select:focus {
-        border-color: var(--blush-rose);
-        box-shadow: 0 0 0 4px rgba(244,194,194,0.2);
-        background: white;
-    }
-    
-    .btn-submit {
-        background: linear-gradient(135deg, var(--blush-rose), var(--dusty-rose));
-        border: none;
-        color: white;
-        padding: 1rem 3rem;
-        border-radius: 30px;
-        font-size: 1.1rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(212,165,165,0.4);
-    }
-    
-    .btn-submit:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(212,165,165,0.5);
-    }
-    
-    .btn-cancel {
-        background: transparent;
-        border: 2px solid var(--blush-rose);
-        color: var(--dusty-rose);
-        padding: 1rem 2.5rem;
-        border-radius: 30px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        margin-right: 1rem;
-    }
-    
-    .btn-cancel:hover {
-        background: var(--blush-rose);
-        color: white;
-    }
-    
-    .task-info {
-        background: var(--cream);
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .task-info-title {
-        font-size: 0.9rem;
-        color: var(--muted-mauve);
-        margin-bottom: 0.5rem;
-    }
-    
-    .task-info-value {
-        font-size: 1.2rem;
-        color: var(--warm-charcoal);
-        font-weight: 600;
-    }
-    
-    .status-option {
-        display: block;
-        position: relative;
-        cursor: pointer;
-    }
-    
-    .status-option input {
-        position: absolute;
-        opacity: 0;
-    }
-    
-    .status-content {
-        padding: 1rem;
-        border: 2px solid rgba(244,194,194,0.3);
-        border-radius: 12px;
-        text-align: center;
-        transition: all 0.3s ease;
-    }
-    
-    .status-option:hover .status-content {
-        border-color: var(--blush-rose);
-    }
-    
-    .status-option input:checked ~ .status-content {
-        border-color: var(--dusty-rose);
-        background: var(--cream);
-    }
-    
-    .status-icon {
-        font-size: 1.5rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    .progress-slider {
-        width: 100%;
-        height: 8px;
-        border-radius: 4px;
-        background: var(--cream);
-        outline: none;
-        -webkit-appearance: none;
-    }
-    
-    .progress-slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--blush-rose), var(--dusty-rose));
-        cursor: pointer;
-        box-shadow: 0 2px 10px rgba(212,165,165,0.4);
-    }
-    
-    .blocked-reason {
-        display: none;
-    }
-    
-    .blocked-reason.show {
-        display: block;
-    }
-</style>
-{% endblock %}
+{% block title %}Update Task - {{ task.title }}{% endblock %}
 
 {% block content %}
-<div class="form-header">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8 text-center">
-                <h1>Update Task</h1>
-                <p>{{ task.title }}</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container">
+<div class="container py-4">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="task-info">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p class="task-info-title">Goal</p>
-                        <p class="task-info-value mb-0">{{ task.goal.title }}</p>
-                    </div>
-                    <div class="col-md-6 text-md-end mt-3 mt-md-0">
-                        <p class="task-info-title">Due Date</p>
-                        <p class="task-info-value mb-0">{{ task.due_date|date:"M d, Y" }}</p>
-                    </div>
+        <div class="col-lg-6">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'goal_list' %}">Goals</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'goal_detail' task.goal.pk %}">{{ task.goal.title|truncatechars:20 }}</a></li>
+                    <li class="breadcrumb-item active">Update Task</li>
+                </ol>
+            </nav>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h4 class="mb-0" style="color: var(--dusty-rose);">
+                        <i class="fas fa-edit me-2"></i>Update Task
+                    </h4>
+                    <p class="text-muted mb-0 small">{{ task.title }}</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="pending" {% if task.status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="in_progress" {% if task.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                <option value="done" {% if task.status == 'done' %}selected{% endif %}>Done</option>
+                                <option value="blocked" {% if task.status == 'blocked' %}selected{% endif %}>Blocked</option>
+                                <option value="at_risk" {% if task.status == 'at_risk' %}selected{% endif %}>At Risk</option>
+                                <option value="overdue" {% if task.status == 'overdue' %}selected{% endif %}>Overdue</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="completion_percentage" class="form-label">Completion %</label>
+                            <input type="range" class="form-range" id="completion_percentage" name="completion_percentage" 
+                                   min="0" max="100" value="{{ task.completion_percentage }}" oninput="document.getElementById('percentValue').innerText = this.value + '%'">
+                            <div class="text-center">
+                                <span id="percentValue">{{ task.completion_percentage }}%</span>
+                            </div>
+                        </div>
+
+                        {% if task.status == 'blocked' %}
+                        <div class="mb-3">
+                            <label for="blocked_reason" class="form-label">Blocked Reason</label>
+                            <textarea class="form-control" id="blocked_reason" name="blocked_reason" rows="3" 
+                                      placeholder="Why is this task blocked?">{{ task.blocked_reason }}</textarea>
+                        </div>
+                        {% endif %}
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Tip:</strong> Setting status to "Done" will automatically mark completion as 100%.
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'goal_detail' task.goal.pk %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Update Task
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
-
-            <div class="form-card">
-                <form method="post" novalidate>
-                    {% csrf_token %}
-                    
-                    <!-- Status Selection -->
-                    <div class="mb-4">
-                        <label class="form-label">Status <span class="text-danger">*</span></label>
-                        <div class="row g-3">
-                            <div class="col-6 col-md-4">
-                                <label class="status-option">
-                                    <input type="radio" name="status" value="pending" {% if task.status == 'pending' %}checked{% endif %} required>
-                                    <div class="status-content">
-                                        <div class="status-icon">⏳</div>
-                                        <div>Pending</div>
-                                    </div>
-                                </label>
-                            </div>
-                            <div class="col-6 col-md-4">
-                                <label class="status-option">
-                                    <input type="radio" name="status" value="in_progress" {% if task.status == 'in_progress' %}checked{% endif %}>
-                                    <div class="status-content">
-                                        <div class="status-icon">🔄</div>
-                                        <div>In Progress</div>
-                                    </div>
-                                </label>
-                            </div>
-                            <div class="col-6 col-md-4">
-                                <label class="status-option">
-                                    <input type="radio" name="status" value="done" {% if task.status == 'done' %}checked{% endif %}>
-                                    <div class="status-content">
-                                        <div class="status-icon">✅</div>
-                                        <div>Done</div>
-                                    </div>
-                                </label>
-                            </div>
-                            <div class="col-6 col-md-4">
-                                <label class="status-option">
-                                    <input type="radio" name="status" value="blocked" {% if task.status == 'blocked' %}checked{% endif %}>
-                                    <div class="status-content">
-                                        <div class="status-icon">🚫</div>
-                                        <div>Blocked</div>
-                                    </div>
-                                </label>
-                            </div>
-                            <div class="col-6 col-md-4">
-                                <label class="status-option">
-                                    <input type="radio" name="status" value="at_risk" {% if task.status == 'at_risk' %}checked{% endif %}>
-                                    <div class="status-content">
-                                        <div class="status-icon">⚠️</div>
-                                        <div>At Risk</div>
-                                    </div>
-                                </label>
-                            </div>
-                            <div class="col-6 col-md-4">
-                                <label class="status-option">
-                                    <input type="radio" name="status" value="overdue" {% if task.status == 'overdue' %}checked{% endif %}>
-                                    <div class="status-content">
-                                        <div class="status-icon">⏰</div>
-                                        <div>Overdue</div>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Blocked Reason -->
-                    <div class="mb-4 blocked-reason {% if task.status == 'blocked' %}show{% endif %}" id="blockedReason">
-                        <label class="form-label">Blocked Reason</label>
-                        <textarea name="blocked_reason" class="form-control" rows="3" placeholder="Why is this task blocked?">{{ task.blocked_reason }}</textarea>
-                    </div>
-                    
-                    <!-- Progress -->
-                    <div class="mb-4">
-                        <label class="form-label">Completion Percentage</label>
-                        <input type="range" name="completion_percentage" class="progress-slider" 
-                               min="0" max="100" value="{{ task.completion_percentage }}" id="progressSlider">
-                        <div class="text-center mt-2">
-                            <span id="progressValue" style="font-size: 1.5rem; font-weight: 700; color: var(--dusty-rose);">
-                                {{ task.completion_percentage }}%
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center pt-3">
-                        <a href="{% url 'goal_detail' task.goal.pk %}" class="btn-cancel">
-                            <i class="fas fa-arrow-left me-2"></i>Cancel
-                        </a>
-                        <button type="submit" class="btn-submit">
-                            <i class="fas fa-save me-2"></i>Update Task
-                        </button>
-                    </div>
-                </form>
-            </div>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    // Progress slider update
-    const slider = document.getElementById('progressSlider');
-    const value = document.getElementById('progressValue');
-    
-    slider.addEventListener('input', function() {
-        value.textContent = this.value + '%';
-    });
-    
-    // Show/hide blocked reason
-    const statusRadios = document.querySelectorAll('input[name="status"]');
-    const blockedReason = document.getElementById('blockedReason');
-    
-    statusRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (this.value === 'blocked') {
-                blockedReason.classList.add('show');
-            } else {
-                blockedReason.classList.remove('show');
-            }
-            
-            // Auto-set progress to 100% if done
-            if (this.value === 'done') {
-                slider.value = 100;
-                value.textContent = '100%';
-            }
-        });
-    });
-</script>
 {% endblock %}

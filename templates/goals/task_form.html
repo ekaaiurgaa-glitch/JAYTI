@@ -1,237 +1,92 @@
 {% extends 'base.html' %}
 
-{% block title %}Add Task - {{ goal.title }} - jayti{% endblock %}
-
-{% block extra_css %}
-<style>
-    .form-header {
-        background: linear-gradient(135deg, var(--blush-rose) 0%, var(--dusty-rose) 100%);
-        padding: 2.5rem 0;
-        margin-bottom: 2rem;
-    }
-    
-    .form-header h1 {
-        color: white;
-        font-size: 2rem;
-    }
-    
-    .form-header p {
-        color: rgba(255,255,255,0.9);
-        font-family: 'Dancing Script', cursive;
-        font-size: 1.3rem;
-    }
-    
-    .form-card {
-        background: white;
-        border-radius: 24px;
-        box-shadow: 0 8px 40px rgba(212,165,165,0.15);
-        padding: 2.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .form-label {
-        font-weight: 600;
-        color: var(--warm-charcoal);
-        margin-bottom: 0.5rem;
-    }
-    
-    .form-control, .form-select {
-        border: 2px solid rgba(244,194,194,0.4);
-        border-radius: 14px;
-        padding: 0.875rem 1.25rem;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        background: var(--cream);
-    }
-    
-    .form-control:focus, .form-select:focus {
-        border-color: var(--blush-rose);
-        box-shadow: 0 0 0 4px rgba(244,194,194,0.2);
-        background: white;
-    }
-    
-    .btn-submit {
-        background: linear-gradient(135deg, var(--blush-rose), var(--dusty-rose));
-        border: none;
-        color: white;
-        padding: 1rem 3rem;
-        border-radius: 30px;
-        font-size: 1.1rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(212,165,165,0.4);
-    }
-    
-    .btn-submit:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(212,165,165,0.5);
-    }
-    
-    .btn-cancel {
-        background: transparent;
-        border: 2px solid var(--blush-rose);
-        color: var(--dusty-rose);
-        padding: 1rem 2.5rem;
-        border-radius: 30px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        margin-right: 1rem;
-    }
-    
-    .btn-cancel:hover {
-        background: var(--blush-rose);
-        color: white;
-    }
-    
-    .goal-info {
-        background: var(--cream);
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .goal-info-title {
-        font-size: 0.9rem;
-        color: var(--muted-mauve);
-        margin-bottom: 0.5rem;
-    }
-    
-    .goal-info-value {
-        font-size: 1.2rem;
-        color: var(--warm-charcoal);
-        font-weight: 600;
-    }
-    
-    .form-check-input:checked {
-        background-color: var(--dusty-rose);
-        border-color: var(--dusty-rose);
-    }
-    
-    .recurrence-options {
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-    }
-    
-    .recurrence-option {
-        flex: 1;
-        min-width: 120px;
-    }
-</style>
-{% endblock %}
+{% block title %}Add Task - {{ goal.title }}{% endblock %}
 
 {% block content %}
-<div class="form-header">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8 text-center">
-                <h1>Add New Task</h1>
-                <p>Create a task for your goal</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container">
+<div class="container py-4">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="goal-info">
-                <div class="row">
-                    <div class="col-md-8">
-                        <p class="goal-info-title">Goal</p>
-                        <p class="goal-info-value mb-0">{{ goal.title }}</p>
-                    </div>
-                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                        <p class="goal-info-title">Target Date</p>
-                        <p class="goal-info-value mb-0">{{ goal.target_date|date:"M d, Y" }}</p>
-                    </div>
+        <div class="col-lg-6">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'goal_list' %}">Goals</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'goal_detail' goal.pk %}">{{ goal.title|truncatechars:20 }}</a></li>
+                    <li class="breadcrumb-item active">Add Task</li>
+                </ol>
+            </nav>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h4 class="mb-0" style="color: var(--dusty-rose);">
+                        <i class="fas fa-plus-circle me-2"></i>Add New Task
+                    </h4>
+                    <p class="text-muted mb-0 small">Goal: {{ goal.title }}</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Task Title</label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   placeholder="e.g., Complete Market Research Report" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" 
+                                      placeholder="Task details..."></textarea>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="department" class="form-label">Department</label>
+                                <select class="form-select" id="department" name="department" required>
+                                    <option value="strategy">Strategy</option>
+                                    <option value="finance">Finance</option>
+                                    <option value="hr">HR</option>
+                                    <option value="operations">Operations</option>
+                                    <option value="sales">Sales</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="due_date" class="form-label">Due Date</label>
+                                <input type="date" class="form-control" id="due_date" name="due_date" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Task Frequency</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_weekly" name="is_weekly">
+                                <label class="form-check-label" for="is_weekly">Weekly recurring task</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_monthly" name="is_monthly">
+                                <label class="form-check-label" for="is_monthly">Monthly recurring task</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_quarterly" name="is_quarterly">
+                                <label class="form-check-label" for="is_quarterly">Quarterly recurring task</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_daily" name="is_daily">
+                                <label class="form-check-label" for="is_daily">Daily recurring task</label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'goal_detail' goal.pk %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Add Task
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
-
-            <div class="form-card">
-                <form method="post" novalidate>
-                    {% csrf_token %}
-                    
-                    <div class="mb-4">
-                        <label class="form-label">Task Title <span class="text-danger">*</span></label>
-                        <input type="text" name="title" class="form-control" 
-                               placeholder="e.g., Complete market research analysis" required>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label class="form-label">Description</label>
-                        <textarea name="description" class="form-control" rows="3"
-                                  placeholder="Describe what needs to be done..."></textarea>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <label class="form-label">Department <span class="text-danger">*</span></label>
-                            <select name="department" class="form-select" required>
-                                <option value="strategy" selected>Strategy</option>
-                                <option value="finance">Finance</option>
-                                <option value="hr">HR</option>
-                                <option value="sales">Sales</option>
-                                <option value="operations">Operations</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-4">
-                            <label class="form-label">Due Date <span class="text-danger">*</span></label>
-                            <input type="date" name="due_date" class="form-control" required>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label class="form-label">Recurrence (Optional)</label>
-                        <div class="recurrence-options">
-                            <div class="form-check recurrence-option">
-                                <input class="form-check-input" type="checkbox" name="is_daily" id="is_daily">
-                                <label class="form-check-label" for="is_daily">
-                                    <i class="fas fa-redo me-1"></i>Daily
-                                </label>
-                            </div>
-                            <div class="form-check recurrence-option">
-                                <input class="form-check-input" type="checkbox" name="is_weekly" id="is_weekly">
-                                <label class="form-check-label" for="is_weekly">
-                                    <i class="fas fa-redo me-1"></i>Weekly
-                                </label>
-                            </div>
-                            <div class="form-check recurrence-option">
-                                <input class="form-check-input" type="checkbox" name="is_monthly" id="is_monthly">
-                                <label class="form-check-label" for="is_monthly">
-                                    <i class="fas fa-redo me-1"></i>Monthly
-                                </label>
-                            </div>
-                            <div class="form-check recurrence-option">
-                                <input class="form-check-input" type="checkbox" name="is_quarterly" id="is_quarterly">
-                                <label class="form-check-label" for="is_quarterly">
-                                    <i class="fas fa-redo me-1"></i>Quarterly
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center pt-3">
-                        <a href="{% url 'goal_detail' goal.pk %}" class="btn-cancel">
-                            <i class="fas fa-arrow-left me-2"></i>Cancel
-                        </a>
-                        <button type="submit" class="btn-submit">
-                            <i class="fas fa-plus me-2"></i>Create Task
-                        </button>
-                    </div>
-                </form>
-            </div>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    // Set minimum date to today and max to goal target date
-    const today = new Date().toISOString().split('T')[0];
-    const targetDate = "{{ goal.target_date|date:'Y-m-d' }}";
-    document.querySelector('input[type="date"]').min = today;
-    document.querySelector('input[type="date"]').max = targetDate;
-</script>
 {% endblock %}
