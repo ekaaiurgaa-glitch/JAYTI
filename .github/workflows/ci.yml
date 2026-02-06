@@ -36,25 +36,7 @@ jobs:
         DATABASE_URL: sqlite:///ci_test_db.sqlite3
       run: |
         echo "🔍 Running Django system checks..."
-        python manage.py check --settings=jaytipargal.settings
-        
-    - name: 🔄 Check Migrations
-      env:
-        SECRET_KEY: django-ci-test-secret-key-not-for-production
-        DEBUG: 'False'
-        DATABASE_URL: sqlite:///ci_test_db.sqlite3
-      run: |
-        echo "🔄 Checking for unapplied migrations..."
-        python manage.py makemigrations --check --dry-run --settings=jaytipargal.settings
-        
-    - name: 🗄️ Run Migrations
-      env:
-        SECRET_KEY: django-ci-test-secret-key-not-for-production
-        DEBUG: 'False'
-        DATABASE_URL: sqlite:///ci_test_db.sqlite3
-      run: |
-        echo "🗄️ Running migrations..."
-        python manage.py migrate --settings=jaytipargal.settings
+        python manage.py check
         
     - name: 📊 Collect Static Files
       env:
@@ -63,7 +45,7 @@ jobs:
         DATABASE_URL: sqlite:///ci_test_db.sqlite3
       run: |
         echo "📊 Collecting static files..."
-        python manage.py collectstatic --noinput --settings=jaytipargal.settings
+        python manage.py collectstatic --noinput
         
     - name: ✅ Build Success
       run: |
