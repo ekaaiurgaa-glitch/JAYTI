@@ -150,7 +150,7 @@ JAYTI_BIRTH_DETAILS = {
 
 # Gemini API Configuration
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
-GEMINI_MODEL = 'gemini-pro'
+GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemini-pro')
 
 # Logging configuration
 LOGGING = {
