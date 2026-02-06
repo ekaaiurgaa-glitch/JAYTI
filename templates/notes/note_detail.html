@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ note.title|default:"Untitled Note" }} - JaytiPargal.in{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <!-- Back Navigation -->
+            <div class="mb-3">
+                <a href="{% url 'note_list' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Notes
+                </a>
+            </div>
+            
+            <!-- Note Card -->
+            <div class="card animate-fade-in">
+                <!-- Card Header with Title and Actions -->
+                <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2" style="border-radius: 16px 16px 0 0; border-bottom: 1px solid rgba(244,194,194,0.3);">
+                    <h3 class="mb-0 font-script" style="color: var(--dusty-rose); font-size: 2rem;">
+                        {% if note.is_pinned %}
+                        <i class="fas fa-thumbtack text-blush me-2" style="font-size: 1.2rem;"></i>
+                        {% endif %}
+                        {{ note.title|default:"Untitled Note" }}
+                    </h3>
+                    
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'note_edit' note.pk %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit me-1"></i>Edit
+                        </a>
+                        <a href="{% url 'note_delete' note.pk %}" class="btn btn-outline-danger btn-sm" style="border-color: #dc3545; color: #dc3545;">
+                            <i class="fas fa-trash me-1"></i>Delete
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Note Content -->
+                <div class="card-body p-4 p-md-5">
+                    <!-- Tags -->
+                    {% if note.tags.all %}
+                    <div class="mb-4">
+                        {% for tag in note.tags.all %}
+                        <span class="badge me-1" style="background-color: {{ tag.color|default:'#F4C2C2' }}; font-size: 0.85rem; padding: 0.5rem 1rem; border-radius: 20px;">
+                            <i class="fas fa-tag me-1" style="font-size: 0.7rem;"></i>{{ tag.name }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Content -->
+                    <div class="note-content" style="font-size: 1.1rem; line-height: 1.8; color: var(--warm-charcoal);">
+                        {{ note.content|safe|default:"<em class='text-muted'>No content...</em>" }}
+                    </div>
+                </div>
+                
+                <!-- Card Footer with Dates -->
+                <div class="card-footer bg-cream" style="border-radius: 0 0 16px 16px; border-top: 1px solid rgba(244,194,194,0.2);">
+                    <div class="row text-center text-muted small">
+                        <div class="col-md-6 py-2 border-md-end" style="border-color: rgba(244,194,194,0.3);">
+                            <i class="fas fa-calendar-plus me-2 text-blush"></i>
+                            <strong>Created:</strong> {{ note.created_at|date:"F d, Y" }} at {{ note.created_at|time:"g:i A" }}
+                        </div>
+                        <div class="col-md-6 py-2">
+                            <i class="fas fa-clock me-2 text-blush"></i>
+                            <strong>Modified:</strong> {{ note.modified_at|date:"F d, Y" }} at {{ note.modified_at|time:"g:i A" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Navigation Footer -->
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'note_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>All Notes
+                </a>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'note_edit' note.pk %}" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>Edit Note
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .note-content p {
+        margin-bottom: 1rem;
+    }
+    
+    .note-content h1,
+    .note-content h2,
+    .note-content h3,
+    .note-content h4,
+    .note-content h5,
+    .note-content h6 {
+        color: var(--dusty-rose);
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .note-content ul,
+    .note-content ol {
+        padding-left: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .note-content li {
+        margin-bottom: 0.5rem;
+    }
+    
+    .note-content blockquote {
+        border-left: 4px solid var(--blush-rose);
+        padding-left: 1rem;
+        margin-left: 0;
+        color: var(--muted-mauve);
+        font-style: italic;
+    }
+    
+    .note-content a {
+        color: var(--dusty-rose);
+        text-decoration: none;
+        border-bottom: 1px solid var(--blush-rose);
+    }
+    
+    .note-content a:hover {
+        color: var(--blush-rose);
+    }
+    
+    @media (max-width: 768px) {
+        .card-header h3 {
+            font-size: 1.5rem !important;
+        }
+        
+        .card-body {
+            padding: 1.5rem !important;
+        }
+    }
+</style>
+{% endblock %}

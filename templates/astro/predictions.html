@@ -1,0 +1,444 @@
+{% extends 'base.html' %}
+
+{% block title %}90-Day Predictions - JaytiPargal.in{% endblock %}
+
+{% block extra_css %}
+<style>
+    .predictions-hero {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+    
+    .timeline-container {
+        position: relative;
+        padding-left: 40px;
+    }
+    
+    .timeline-container::before {
+        content: '';
+        position: absolute;
+        left: 12px;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(to bottom, var(--blush-rose), var(--lavender-mist), var(--blush-rose));
+        border-radius: 2px;
+    }
+    
+    .prediction-card {
+        position: relative;
+        background: white;
+        border-radius: 16px;
+        padding: 1.75rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        border-left: 4px solid transparent;
+    }
+    
+    .prediction-card:hover {
+        transform: translateX(5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    .prediction-card::before {
+        content: '';
+        position: absolute;
+        left: -40px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 4px solid white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    
+    .prediction-card.favorable {
+        border-left-color: #28a745;
+    }
+    
+    .prediction-card.favorable::before {
+        background: linear-gradient(135deg, #28a745, #20c997);
+    }
+    
+    .prediction-card.neutral {
+        border-left-color: #6c757d;
+    }
+    
+    .prediction-card.neutral::before {
+        background: linear-gradient(135deg, #6c757d, #adb5bd);
+    }
+    
+    .prediction-card.challenging {
+        border-left-color: #dc3545;
+    }
+    
+    .prediction-card.challenging::before {
+        background: linear-gradient(135deg, #dc3545, #fd7e14);
+    }
+    
+    .prediction-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    
+    .prediction-period {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(244,194,194,0.15);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        color: var(--warm-charcoal);
+    }
+    
+    .prediction-focus {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    
+    .focus-career {
+        background: rgba(230,230,250,0.5);
+        color: #6b5b95;
+    }
+    
+    .focus-relationships {
+        background: rgba(244,194,194,0.4);
+        color: #c99aa1;
+    }
+    
+    .focus-health {
+        background: rgba(144,238,144,0.3);
+        color: #2e8b57;
+    }
+    
+    .focus-spirituality {
+        background: rgba(255,218,185,0.5);
+        color: #d2691e;
+    }
+    
+    .focus-finance {
+        background: rgba(255,215,0,0.2);
+        color: #b8860b;
+    }
+    
+    .intensity-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .intensity-favorable {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        color: #155724;
+    }
+    
+    .intensity-neutral {
+        background: linear-gradient(135deg, #e2e3e5, #d6d8db);
+        color: #383d41;
+    }
+    
+    .intensity-challenging {
+        background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+        color: #721c24;
+    }
+    
+    .prediction-description {
+        font-size: 1rem;
+        line-height: 1.7;
+        color: var(--warm-charcoal);
+        margin-bottom: 1.25rem;
+    }
+    
+    .prediction-recommendation {
+        background: linear-gradient(135deg, rgba(244,194,194,0.1), rgba(230,230,250,0.1));
+        border-radius: 12px;
+        padding: 1.25rem;
+        border-left: 3px solid var(--blush-rose);
+    }
+    
+    .recommendation-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--dusty-rose);
+        margin-bottom: 0.5rem;
+    }
+    
+    .recommendation-text {
+        font-size: 0.95rem;
+        color: var(--warm-charcoal);
+        margin-bottom: 0;
+    }
+    
+    .prediction-dates {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px dashed rgba(244,194,194,0.4);
+        font-size: 0.9rem;
+        color: var(--muted-mauve);
+    }
+    
+    .date-range {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .legend-section {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+    
+    .legend-group {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .legend-title {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--muted-mauve);
+    }
+    
+    .legend-items {
+        display: flex;
+        gap: 0.75rem;
+    }
+    
+    .overview-card {
+        background: linear-gradient(135deg, rgba(244,194,194,0.15), rgba(230,230,250,0.15));
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .overview-title {
+        font-family: 'Playfair Display', serif;
+        color: var(--dusty-rose);
+        margin-bottom: 1rem;
+    }
+    
+    .overview-text {
+        color: var(--warm-charcoal);
+        font-size: 1.05rem;
+        line-height: 1.7;
+        margin-bottom: 0;
+    }
+    
+    @media (max-width: 768px) {
+        .timeline-container {
+            padding-left: 30px;
+        }
+        
+        .prediction-card::before {
+            left: -30px;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .prediction-header {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="predictions-hero">
+        <h1 class="display-5 mb-3">
+            <i class="fas fa-star text-blush me-3"></i>90-Day Cosmic Forecast
+        </h1>
+        <p class="text-mauve lead">Personalized astrological insights for the days ahead</p>
+    </div>
+    
+    <!-- Overview -->
+    {% if overview %}
+    <div class="overview-card">
+        <h4 class="overview-title">
+            <i class="fas fa-sparkles me-2"></i>Period Overview
+        </h4>
+        <p class="overview-text">{{ overview }}</p>
+    </div>
+    {% endif %}
+    
+    <!-- Legend -->
+    <div class="legend-section">
+        <div class="legend-group">
+            <span class="legend-title">Intensity:</span>
+            <div class="legend-items">
+                <span class="intensity-badge intensity-favorable">
+                    <i class="fas fa-arrow-up"></i> Favorable
+                </span>
+                <span class="intensity-badge intensity-neutral">
+                    <i class="fas fa-minus"></i> Neutral
+                </span>
+                <span class="intensity-badge intensity-challenging">
+                    <i class="fas fa-arrow-down"></i> Challenging
+                </span>
+            </div>
+        </div>
+        <div class="legend-group">
+            <span class="legend-title">Focus Areas:</span>
+            <div class="legend-items">
+                <span class="prediction-focus focus-career">
+                    <i class="fas fa-briefcase"></i> Career
+                </span>
+                <span class="prediction-focus focus-relationships">
+                    <i class="fas fa-heart"></i> Relationships
+                </span>
+                <span class="prediction-focus focus-health">
+                    <i class="fas fa-heartbeat"></i> Health
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Predictions Timeline -->
+    <div class="timeline-container">
+        {% for prediction in predictions %}
+        <div class="prediction-card {{ prediction.intensity }}">
+            <div class="prediction-header">
+                <div>
+                    <span class="prediction-period">
+                        <i class="fas fa-calendar-alt"></i>
+                        {{ prediction.period }}
+                    </span>
+                    {% if prediction.focus == 'Career' %}
+                    <span class="prediction-focus focus-career">
+                        <i class="fas fa-briefcase"></i> Career
+                    </span>
+                    {% elif prediction.focus == 'Relationships' %}
+                    <span class="prediction-focus focus-relationships">
+                        <i class="fas fa-heart"></i> Relationships
+                    </span>
+                    {% elif prediction.focus == 'Health' %}
+                    <span class="prediction-focus focus-health">
+                        <i class="fas fa-heartbeat"></i> Health
+                    </span>
+                    {% elif prediction.focus == 'Spirituality' %}
+                    <span class="prediction-focus focus-spirituality">
+                        <i class="fas fa-praying-hands"></i> Spirituality
+                    </span>
+                    {% elif prediction.focus == 'Finance' %}
+                    <span class="prediction-focus focus-finance">
+                        <i class="fas fa-coins"></i> Finance
+                    </span>
+                    {% else %}
+                    <span class="prediction-focus focus-career">
+                        <i class="fas fa-star"></i> {{ prediction.focus }}
+                    </span>
+                    {% endif %}
+                </div>
+                
+                {% if prediction.intensity == 'favorable' %}
+                <span class="intensity-badge intensity-favorable">
+                    <i class="fas fa-arrow-up"></i> Favorable
+                </span>
+                {% elif prediction.intensity == 'neutral' %}
+                <span class="intensity-badge intensity-neutral">
+                    <i class="fas fa-minus"></i> Neutral
+                </span>
+                {% else %}
+                <span class="intensity-badge intensity-challenging">
+                    <i class="fas fa-arrow-down"></i> Challenging
+                </span>
+                {% endif %}
+            </div>
+            
+            <p class="prediction-description">
+                {{ prediction.description }}
+            </p>
+            
+            <div class="prediction-recommendation">
+                <div class="recommendation-label">
+                    <i class="fas fa-lightbulb"></i>
+                    Guidance
+                </div>
+                <p class="recommendation-text">
+                    {{ prediction.recommendation }}
+                </p>
+            </div>
+            
+            {% if prediction.dates %}
+            <div class="prediction-dates">
+                <div class="date-range">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>{{ prediction.dates.start|date:"F d" }} — {{ prediction.dates.end|date:"F d, Y" }}</span>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="text-center py-5">
+            <i class="fas fa-moon text-muted mb-3" style="font-size: 3rem;"></i>
+            <h5 class="text-muted">Predictions Coming Soon</h5>
+            <p class="text-muted">Your personalized 90-day forecast is being calculated based on your birth chart.</p>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Summary Section -->
+    {% if summary %}
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="mb-3">
+                <i class="fas fa-chart-line text-blush me-2"></i>Key Themes for This Period
+            </h5>
+            <div class="row g-3">
+                {% for theme in summary %}
+                <div class="col-md-4">
+                    <div class="d-flex align-items-start gap-3 p-3 rounded" style="background: rgba(244,194,194,0.1);">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-check-circle text-blush"></i>
+                        </div>
+                        <p class="mb-0">{{ theme }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Navigation -->
+    <div class="text-center mt-5">
+        <a href="{% url 'astro_dashboard' %}" class="btn btn-outline-secondary me-2">
+            <i class="fas fa-arrow-left me-2"></i>Back to Astro
+        </a>
+        <a href="{% url 'birth_chart' %}" class="btn btn-outline-primary me-2">
+            <i class="fas fa-chart-pie me-2"></i>Birth Chart
+        </a>
+        <a href="{% url 'dasha_periods' %}" class="btn btn-primary">
+            <i class="fas fa-hourglass-half me-2"></i>Dasha Periods
+        </a>
+    </div>
+</div>
+{% endblock %}

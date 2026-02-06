@@ -1,0 +1,392 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Diary Calendar - {{ current_month|date:"F Y" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .calendar-header {
+        background: linear-gradient(135deg, rgba(244,194,194,0.15), rgba(230,230,250,0.15));
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .calendar-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        color: var(--dusty-rose);
+        margin-bottom: 1rem;
+    }
+    
+    .calendar-nav {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1.5rem;
+    }
+    
+    .nav-arrow {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: white;
+        border: 2px solid rgba(244,194,194,0.3);
+        color: var(--dusty-rose);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    
+    .nav-arrow:hover {
+        background: linear-gradient(135deg, var(--blush-rose), var(--dusty-rose));
+        color: white;
+        border-color: transparent;
+        transform: scale(1.1);
+    }
+    
+    .current-month {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        color: var(--warm-charcoal);
+        min-width: 200px;
+    }
+    
+    .calendar-card {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+    
+    .calendar-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0.5rem;
+    }
+    
+    .calendar-table th {
+        font-family: 'Playfair Display', serif;
+        color: var(--muted-mauve);
+        font-weight: 600;
+        padding: 1rem 0.5rem;
+        text-align: center;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .calendar-day {
+        aspect-ratio: 1;
+        border-radius: 12px;
+        text-align: center;
+        vertical-align: middle;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    
+    .day-cell {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        text-decoration: none;
+        color: var(--warm-charcoal);
+        font-size: 0.95rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        position: relative;
+        padding: 0.5rem;
+    }
+    
+    .day-cell:hover {
+        background: rgba(244,194,194,0.1);
+        transform: scale(1.05);
+    }
+    
+    .day-cell.other-month {
+        color: var(--muted-mauve);
+        opacity: 0.5;
+    }
+    
+    .day-cell.today {
+        background: linear-gradient(135deg, var(--blush-rose), var(--dusty-rose));
+        color: white;
+        box-shadow: 0 4px 12px rgba(244,194,194,0.4);
+    }
+    
+    .day-cell.has-entry {
+        background: rgba(244,194,194,0.15);
+        border: 2px solid var(--blush-rose);
+    }
+    
+    .day-cell.has-entry:hover {
+        background: rgba(244,194,194,0.25);
+    }
+    
+    .day-number {
+        font-size: 1rem;
+        font-weight: 600;
+        line-height: 1;
+    }
+    
+    .day-indicator {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--dusty-rose);
+        margin-top: 4px;
+    }
+    
+    .day-cell.today .day-indicator {
+        background: white;
+    }
+    
+    .mood-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-top: 4px;
+    }
+    
+    .mood-1 { background: #dc3545; }
+    .mood-2 { background: #fd7e14; }
+    .mood-3 { background: #6c757d; }
+    .mood-4 { background: #28a745; }
+    .mood-5 { background: #20c997; }
+    
+    .calendar-legend {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(244,194,194,0.2);
+        flex-wrap: wrap;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        color: var(--muted-mauve);
+    }
+    
+    .legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+    
+    .legend-entry {
+        background: rgba(244,194,194,0.3);
+        border: 2px solid var(--blush-rose);
+    }
+    
+    .legend-today {
+        background: linear-gradient(135deg, var(--blush-rose), var(--dusty-rose));
+    }
+    
+    .stats-row {
+        margin-top: 2rem;
+    }
+    
+    .stat-card-calendar {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    
+    .stat-number {
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        color: var(--dusty-rose);
+        margin-bottom: 0.25rem;
+    }
+    
+    .quick-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .action-btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .action-btn-primary {
+        background: linear-gradient(135deg, var(--blush-rose), var(--dusty-rose));
+        color: white;
+        border: none;
+    }
+    
+    .action-btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(244,194,194,0.4);
+        color: white;
+    }
+    
+    .action-btn-outline {
+        background: white;
+        color: var(--dusty-rose);
+        border: 2px solid var(--blush-rose);
+    }
+    
+    .action-btn-outline:hover {
+        background: var(--blush-rose);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="calendar-header animate-fade-in">
+        <h1 class="calendar-title">
+            <i class="fas fa-calendar-alt me-3"></i>Diary Calendar
+        </h1>
+        <div class="calendar-nav">
+            <a href="{% url 'diary_calendar' %}?month={{ prev_month|date:'Y-m' }}" class="nav-arrow" title="Previous Month">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+            <span class="current-month">{{ current_month|date:"F Y" }}</span>
+            <a href="{% url 'diary_calendar' %}?month={{ next_month|date:'Y-m' }}" class="nav-arrow" title="Next Month">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Calendar Grid -->
+    <div class="calendar-card animate-fade-in">
+        <table class="calendar-table">
+            <thead>
+                <tr>
+                    <th>Sun</th>
+                    <th>Mon</th>
+                    <th>Tue</th>
+                    <th>Wed</th>
+                    <th>Thu</th>
+                    <th>Fri</th>
+                    <th>Sat</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for week in calendar_weeks %}
+                <tr>
+                    {% for day in week %}
+                    <td class="calendar-day">
+                        {% if day.entry %}
+                        <a href="{% url 'diary_entry_detail' day.entry.id %}" class="day-cell has-entry" title="View entry for {{ day.date|date:'F d, Y' }}">
+                            <span class="day-number">{{ day.date.day }}</span>
+                            {% if day.entry.mood %}
+                            <span class="mood-dot mood-{{ day.entry.mood }}"></span>
+                            {% else %}
+                            <span class="day-indicator"></span>
+                            {% endif %}
+                        </a>
+                        {% elif day.is_today %}
+                        <a href="{% url 'diary_write' %}" class="day-cell today" title="Write today's entry">
+                            <span class="day-number">{{ day.date.day }}</span>
+                            <span class="day-indicator"></span>
+                        </a>
+                        {% else %}
+                        <span class="day-cell {% if not day.is_current_month %}other-month{% endif %}">
+                            <span class="day-number">{{ day.date.day }}</span>
+                        </span>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- Legend -->
+        <div class="calendar-legend">
+            <div class="legend-item">
+                <span class="legend-dot legend-today"></span>
+                <span>Today</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot legend-entry"></span>
+                <span>Has Entry</span>
+            </div>
+            <div class="legend-item">
+                <span class="mood-dot mood-1"></span>
+                <span>Struggling</span>
+            </div>
+            <div class="legend-item">
+                <span class="mood-dot mood-2"></span>
+                <span>Difficult</span>
+            </div>
+            <div class="legend-item">
+                <span class="mood-dot mood-3"></span>
+                <span>Neutral</span>
+            </div>
+            <div class="legend-item">
+                <span class="mood-dot mood-4"></span>
+                <span>Good</span>
+            </div>
+            <div class="legend-item">
+                <span class="mood-dot mood-5"></span>
+                <span>Great</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Month Stats -->
+    <div class="row g-3 stats-row">
+        <div class="col-md-4">
+            <div class="stat-card-calendar">
+                <div class="stat-number">{{ entries_this_month|default:0 }}</div>
+                <small class="text-mauve">Entries This Month</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card-calendar">
+                <div class="stat-number">{{ completion_rate|default:0 }}%</div>
+                <small class="text-mauve">Completion Rate</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card-calendar">
+                <div class="stat-number">{{ avg_mood_month|default:"-" }}</div>
+                <small class="text-mauve">Avg Mood</small>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <a href="{% url 'diary_write' %}" class="action-btn action-btn-primary">
+            <i class="fas fa-pen"></i>Write Today
+        </a>
+        <a href="{% url 'diary_overview' %}" class="action-btn action-btn-outline">
+            <i class="fas fa-list"></i>Overview
+        </a>
+        <a href="{% url 'diary_summary' %}" class="action-btn action-btn-outline">
+            <i class="fas fa-chart-line"></i>Insights
+        </a>
+    </div>
+</div>
+{% endblock %}

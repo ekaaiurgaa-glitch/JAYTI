@@ -1,0 +1,332 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ entry.entry_date|date:"F d, Y" }} - Diary Entry{% endblock %}
+
+{% block extra_css %}
+<style>
+    .entry-header {
+        background: linear-gradient(135deg, rgba(244,194,194,0.15), rgba(230,230,250,0.15));
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+    
+    .entry-date-display {
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        color: var(--dusty-rose);
+        margin-bottom: 0.5rem;
+    }
+    
+    .entry-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+    }
+    
+    .meta-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.85rem;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    
+    .mood-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    
+    .mood-1 { background: rgba(220, 53, 69, 0.1); color: #dc3545; }
+    .mood-2 { background: rgba(253, 126, 20, 0.1); color: #fd7e14; }
+    .mood-3 { background: rgba(108, 117, 125, 0.1); color: #6c757d; }
+    .mood-4 { background: rgba(40, 167, 69, 0.1); color: #28a745; }
+    .mood-5 { background: rgba(32, 201, 151, 0.1); color: #20c997; }
+    
+    .entry-content-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        min-height: 300px;
+    }
+    
+    .entry-content {
+        font-size: 1.05rem;
+        line-height: 1.9;
+        color: var(--warm-charcoal);
+        white-space: pre-wrap;
+        font-family: 'Lato', sans-serif;
+    }
+    
+    .entry-content p {
+        margin-bottom: 1rem;
+    }
+    
+    .prompt-card {
+        background: linear-gradient(135deg, rgba(244,194,194,0.1), rgba(230,230,250,0.1));
+        border-left: 4px solid var(--blush-rose);
+        border-radius: 0 12px 12px 0;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .prompt-label {
+        font-size: 0.8rem;
+        color: var(--muted-mauve);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .prompt-text {
+        font-style: italic;
+        color: var(--warm-charcoal);
+        font-size: 1rem;
+        margin-bottom: 0;
+    }
+    
+    .nav-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    
+    .nav-btn-prev {
+        background: white;
+        color: var(--muted-mauve);
+        border: 2px solid rgba(244,194,194,0.3);
+    }
+    
+    .nav-btn-prev:hover {
+        background: rgba(244,194,194,0.1);
+        color: var(--dusty-rose);
+    }
+    
+    .nav-btn-next {
+        background: white;
+        color: var(--muted-mauve);
+        border: 2px solid rgba(244,194,194,0.3);
+    }
+    
+    .nav-btn-next:hover {
+        background: rgba(244,194,194,0.1);
+        color: var(--dusty-rose);
+    }
+    
+    .edit-btn {
+        background: linear-gradient(135deg, var(--blush-rose), var(--dusty-rose));
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 25px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .edit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(244,194,194,0.4);
+        color: white;
+    }
+    
+    .edit-btn.disabled {
+        background: #e9ecef;
+        color: #adb5bd;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+    
+    .input-method-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 0.5rem;
+        font-size: 1rem;
+    }
+    
+    .input-type { background: rgba(244,194,194,0.2); color: var(--dusty-rose); }
+    .input-voice { background: rgba(229, 115, 115, 0.2); color: #e57373; }
+    .input-stylus { background: rgba(108, 117, 125, 0.15); color: var(--muted-mauve); }
+    
+    .decorative-quote {
+        font-family: 'Dancing Script', cursive;
+        font-size: 4rem;
+        color: var(--blush-rose);
+        opacity: 0.3;
+        line-height: 1;
+        position: absolute;
+        top: 1rem;
+        right: 1.5rem;
+    }
+    
+    .mood-note {
+        background: rgba(244,194,194,0.08);
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        margin-top: 1.5rem;
+        font-size: 0.9rem;
+        color: var(--muted-mauve);
+        font-style: italic;
+    }
+    
+    .mood-note strong {
+        color: var(--dusty-rose);
+        font-style: normal;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Entry Header -->
+    <div class="entry-header animate-fade-in">
+        <span class="decorative-quote">"</span>
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="entry-date-display">
+                    <i class="far fa-calendar-heart me-3"></i>{{ entry.entry_date|date:"F d, Y" }}
+                </div>
+                <div class="entry-meta">
+                    {% if entry.mood %}
+                    <span class="mood-badge mood-{{ entry.mood }}">
+                        <i class="fas fa-heart me-1"></i>
+                        {% if entry.mood == 1 %}Struggling
+                        {% elif entry.mood == 2 %}Difficult
+                        {% elif entry.mood == 3 %}Neutral
+                        {% elif entry.mood == 4 %}Good
+                        {% elif entry.mood == 5 %}Great
+                        {% endif %}
+                    </span>
+                    {% endif %}
+                    <span class="meta-badge">
+                        <i class="fas fa-clock text-blush"></i>
+                        {{ entry.entry_date|date:"l" }}
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 mt-3 mt-md-0 text-md-end">
+                {% if is_today %}
+                <a href="{% url 'diary_write' %}" class="edit-btn">
+                    <i class="fas fa-edit"></i>Edit Entry
+                </a>
+                {% else %}
+                <span class="edit-btn disabled" title="Only today's entry can be edited">
+                    <i class="fas fa-lock"></i>Locked
+                </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Prompt Used -->
+    {% if entry.prompt_used %}
+    <div class="prompt-card animate-fade-in">
+        <div class="prompt-label">
+            <i class="fas fa-lightbulb me-1"></i>Prompt Used
+        </div>
+        <p class="prompt-text">"{{ entry.prompt_used }}"</p>
+    </div>
+    {% endif %}
+    
+    <!-- Entry Content -->
+    <div class="entry-content-card animate-fade-in">
+        <div class="entry-content">
+            {{ entry.content|linebreaks }}
+        </div>
+        
+        {% if entry.mood_note %}
+        <div class="mood-note">
+            <strong><i class="fas fa-comment-dots me-2"></i>Mood Note:</strong>
+            {{ entry.mood_note }}
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Entry Meta Footer -->
+    <div class="row mt-4 align-items-center animate-fade-in">
+        <div class="col-md-6">
+            <div class="d-flex align-items-center">
+                <span class="text-mauve me-3" style="font-size: 0.9rem;">
+                    <strong>Input Method:</strong>
+                </span>
+                {% if entry.input_method == 'type' %}
+                <span class="meta-badge">
+                    <span class="input-method-icon input-type">
+                        <i class="fas fa-keyboard"></i>
+                    </span>
+                    Typed
+                </span>
+                {% elif entry.input_method == 'voice' %}
+                <span class="meta-badge">
+                    <span class="input-method-icon input-voice">
+                        <i class="fas fa-microphone"></i>
+                    </span>
+                    Voice
+                </span>
+                {% elif entry.input_method == 'stylus' %}
+                <span class="meta-badge">
+                    <span class="input-method-icon input-stylus">
+                        <i class="fas fa-pen"></i>
+                    </span>
+                    Handwritten
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-6 mt-3 mt-md-0 text-md-end">
+            <span class="text-mauve" style="font-size: 0.85rem;">
+                <i class="fas fa-shield-alt me-1"></i>Private & Encrypted
+            </span>
+        </div>
+    </div>
+    
+    <!-- Navigation -->
+    <div class="row mt-4 pt-4" style="border-top: 1px solid rgba(244,194,194,0.2);">
+        <div class="col-6">
+            {% if prev_entry %}
+            <a href="{% url 'diary_entry_detail' prev_entry.id %}" class="nav-btn nav-btn-prev">
+                <i class="fas fa-arrow-left"></i>
+                <span>{{ prev_entry.entry_date|date:"M d" }}</span>
+            </a>
+            {% endif %}
+        </div>
+        <div class="col-6 text-end">
+            {% if next_entry %}
+            <a href="{% url 'diary_entry_detail' next_entry.id %}" class="nav-btn nav-btn-next">
+                <span>{{ next_entry.entry_date|date:"M d" }}</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Back to Overview -->
+    <div class="text-center mt-4">
+        <a href="{% url 'diary_overview' %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Diary
+        </a>
+    </div>
+</div>
+{% endblock %}
