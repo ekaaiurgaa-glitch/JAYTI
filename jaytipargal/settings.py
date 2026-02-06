@@ -211,6 +211,55 @@ JAYTI_BIRTH_DETAILS = {
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
 GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemini-pro')
 
+# Google Service Account Credentials (for Gemini/Vertex AI)
+# Option 1: JSON content directly in environment variable
+GOOGLE_CREDENTIALS_JSON = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS_JSON', '')
+
+# Option 2: Path to credentials file
+GOOGLE_APPLICATION_CREDENTIALS = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', '')
+
+# Handle Google credentials for Railway deployment
+import tempfile
+import json
+
+if GOOGLE_CREDENTIALS_JSON:
+    # Write JSON credentials to temp file for Google libraries
+    try:
+        # Validate JSON first
+        json.loads(GOOGLE_CREDENTIALS_JSON)
+        
+        # Create temp file
+        creds_file = tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False)
+        creds_file.write(GOOGLE_CREDENTIALS_JSON)
+        creds_file.close()
+        
+        # Set path for Google libraries
+        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = creds_file.name
+        GOOGLE_APPLICATION_CREDENTIALS = creds_file.name
+        
+        print(f"✓ Google credentials loaded from environment variable")
+    except json.JSONDecodeError as e:
+        print(f"⚠️ Invalid GOOGLE_CREDENTIALS_JSON: {e}")
+
+# Configure Gemini with service account if available
+try:
+    if GOOGLE_APPLICATION_CREDENTIALS or GOOGLE_CREDENTIALS_JSON:
+        import google.generativeai as genai
+        
+        # If using service account, configure accordingly
+        if GOOGLE_APPLICATION_CREDENTIALS and os.path.exists(GOOGLE_APPLICATION_CREDENTIALS):
+            # For Vertex AI / Service account authentication
+            genai.configure()
+            print("✓ Gemini configured with service account")
+        elif GEMINI_API_KEY:
+            # Standard API key authentication
+            genai.configure(api_key=GEMINI_API_KEY)
+            print("✓ Gemini configured with API key")
+except ImportError:
+    print("⚠️ google-generativeai not installed")
+except Exception as e:
+    print(f"⚠️ Gemini configuration error: {e}")
+
 # Logging configuration - Enhanced for Railway debugging
 LOGGING = {
     'version': 1,

@@ -57,3 +57,9 @@ aiml/
 
 # Logs
 logs/
+
+# Google Cloud / Gemini Service Account Credentials
+*gen-lang-client*.json
+*service-account*.json
+google-credentials.json
+credentials.json
