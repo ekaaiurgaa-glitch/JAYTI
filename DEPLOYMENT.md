@@ -1,4 +1,4 @@
-# 🚀 DEPLOYMENT GUIDE - JaytiPargal.in
+# 🚀 DEPLOYMENT GUIDE - jayti
 
 **Domain:** jaytibirthday.in  
 **Repository:** https://github.com/ekaaiurgaa-glitch/JAYTI  

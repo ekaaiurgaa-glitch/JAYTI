@@ -1,10 +1,10 @@
-# JaytiPargal.in - Personal Life Companion
+# jayti - Personal Life Companion
 
 A heartfelt gift created for Jayti Pargal's 29th Birthday (February 6, 2026).
 
 ## 🌸 About This Project
 
-**JaytiPargal.in** is a personal life companion website designed with love by Vivek. It embodies the philosophy of the Five Pillars, combining ancient wisdom with modern productivity tools to support Jayti's journey of growth, healing, and self-discovery.
+**jayti** is a personal life companion website designed with love by Vivek. It embodies the philosophy of the Five Pillars, combining ancient wisdom with modern productivity tools to support Jayti's journey of growth, healing, and self-discovery.
 
 ### The Five Pillars
 
