@@ -142,21 +142,13 @@ def dashboard(request):
     active_goals = Goal.objects.filter(user=request.user, status='active').count()
     pending_tasks = Task.objects.filter(goal__user=request.user, status='pending').count()
     
-    # Check if today is February 6, 2026 (Birthday Launch)
+    # Check if today is February 6 (Jayti's Birthday) - Show Vivek's message only on birthday
     today = datetime.now()
-    is_birthday_launch = (today.year == 2026 and today.month == 2 and today.day == 6)
+    is_birthday = (today.month == 2 and today.day == 6)
     
-    # Check for Vivek's message (first login of day or birthday)
-    # Use session to track if message has been seen
-    session_key = f'vivek_message_seen_{today.strftime("%Y%m%d")}'
-    has_seen_today = request.session.get(session_key, False)
-    
-    # Show message on birthday OR on first login of the day
-    show_vivek_message = (is_birthday_launch or not has_seen_today)
-    
-    if show_vivek_message and not has_seen_today:
-        request.session[session_key] = True
-        request.session.modified = True
+    # Only show the message on her birthday (Feb 6) each year
+    # This makes it special rather than a daily interruption
+    show_vivek_message = is_birthday
     
     context = {
         'recent_notes': recent_notes,
@@ -164,7 +156,8 @@ def dashboard(request):
         'active_goals': active_goals,
         'pending_tasks': pending_tasks,
         'show_vivek_message': show_vivek_message,
-        'is_birthday_launch': is_birthday_launch,
+        'is_birthday': is_birthday,
+        'jayti_age': today.year - 1997,
     }
     
     return render(request, 'core/dashboard.html', context)
