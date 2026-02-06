@@ -29,7 +29,8 @@ ALLOWED_HOSTS = [h.strip() for h in ALLOWED_HOSTS_ENV.split(',') if h.strip()]
 
 # Railway deployment: Add Railway domain patterns
 # Railway domains follow pattern: *.up.railway.app
-railway_domains = ['.up.railway.app', '*.up.railway.app']
+# Also add healthcheck.railway.app for Railway health checks
+railway_domains = ['.up.railway.app', '*.up.railway.app', 'healthcheck.railway.app']
 for domain in railway_domains:
     if domain not in ALLOWED_HOSTS:
         ALLOWED_HOSTS.append(domain)
