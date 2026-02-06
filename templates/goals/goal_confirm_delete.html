@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Goal - JaytiPargal.in{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-header {
+        background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .delete-title {
+        color: #c62828;
+        font-size: 2rem;
+    }
+    
+    .delete-card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+        padding: 3rem;
+        text-align: center;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .warning-icon {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #ffebee, #ffcdd2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        font-size: 3rem;
+        color: #c62828;
+    }
+    
+    .goal-preview {
+        background: var(--cream);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .goal-preview-title {
+        font-size: 1.3rem;
+        color: var(--warm-charcoal);
+        margin-bottom: 0.5rem;
+    }
+    
+    .goal-preview-meta {
+        color: var(--muted-mauve);
+        font-size: 0.9rem;
+    }
+    
+    .btn-delete {
+        background: linear-gradient(135deg, #ef5350, #c62828);
+        border: none;
+        color: white;
+        padding: 1rem 3rem;
+        border-radius: 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-delete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(198,40,40,0.4);
+        color: white;
+    }
+    
+    .btn-cancel {
+        background: transparent;
+        border: 2px solid var(--blush-rose);
+        color: var(--dusty-rose);
+        padding: 1rem 2.5rem;
+        border-radius: 30px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin-right: 1rem;
+    }
+    
+    .btn-cancel:hover {
+        background: var(--blush-rose);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-header">
+    <div class="container text-center">
+        <h1 class="delete-title">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Delete Goal
+        </h1>
+    </div>
+</div>
+
+<div class="container">
+    <div class="delete-card">
+        <div class="warning-icon">
+            <i class="fas fa-trash-alt"></i>
+        </div>
+        
+        <h2 class="mb-3">Are you sure?</h2>
+        <p class="text-muted" style="font-size: 1.1rem;">
+            This action cannot be undone. This will permanently delete the goal and all associated tasks.
+        </p>
+        
+        <div class="goal-preview">
+            <p class="goal-preview-title">{{ goal.title }}</p>
+            <p class="goal-preview-meta mb-0">
+                <i class="fas fa-tag me-2"></i>{{ goal.get_role_category_display }}
+                <span class="mx-2">|</span>
+                <i class="fas fa-tasks me-2"></i>{{ goal.tasks.count }} tasks
+            </p>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <a href="{% url 'goal_detail' goal.pk %}" class="btn-cancel">
+                    <i class="fas fa-arrow-left me-2"></i>Cancel
+                </a>
+                <button type="submit" class="btn-delete">
+                    <i class="fas fa-trash-alt me-2"></i>Yes, Delete
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

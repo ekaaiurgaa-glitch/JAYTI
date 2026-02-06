@@ -1,0 +1,317 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ info.symbol|default:"" }} {{ planet|title }} - JaytiPargal.in{% endblock %}
+
+{% block extra_css %}
+<style>
+    .planet-header {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        padding: 4rem 0;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .planet-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 50%, rgba(255,255,255,0.05) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(244,194,194,0.1) 0%, transparent 50%);
+    }
+    
+    .planet-symbol {
+        font-size: 5rem;
+        color: #F4C2C2;
+        text-shadow: 0 0 30px rgba(244,194,194,0.5);
+        position: relative;
+        z-index: 1;
+    }
+    
+    .planet-name {
+        color: white;
+        font-size: 3rem;
+        margin-top: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .planet-subtitle {
+        color: rgba(255,255,255,0.7);
+        font-family: 'Dancing Script', cursive;
+        font-size: 1.5rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .info-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+    }
+    
+    .info-title {
+        font-size: 1.1rem;
+        color: var(--muted-mauve);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .info-value {
+        font-size: 1.5rem;
+        color: var(--warm-charcoal);
+        font-weight: 600;
+    }
+    
+    .rashi-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, var(--blush-rose), var(--dusty-rose));
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 30px;
+        font-weight: 600;
+    }
+    
+    .interpretation-card {
+        background: linear-gradient(135deg, #FFF5F7 0%, white 100%);
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    
+    .interpretation-title {
+        color: var(--dusty-rose);
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .interpretation-text {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: var(--warm-charcoal);
+    }
+    
+    .details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .detail-item {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    
+    .detail-icon {
+        font-size: 1.5rem;
+        color: var(--dusty-rose);
+        margin-bottom: 0.75rem;
+    }
+    
+    .detail-label {
+        font-size: 0.9rem;
+        color: var(--muted-mauve);
+        margin-bottom: 0.25rem;
+    }
+    
+    .detail-value {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--warm-charcoal);
+    }
+    
+    .house-section {
+        background: linear-gradient(135deg, var(--lavender-mist), #E8E8F5);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .house-title {
+        color: var(--warm-charcoal);
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .back-btn {
+        position: absolute;
+        top: 2rem;
+        left: 2rem;
+        z-index: 10;
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+    }
+    
+    .back-btn:hover {
+        background: rgba(255,255,255,0.2);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="planet-header">
+    <div class="container text-center position-relative">
+        <a href="{% url 'birth_chart' %}" class="back-btn">
+            <i class="fas fa-arrow-left me-2"></i>Back to Chart
+        </a>
+        
+        <div class="planet-symbol">{{ info.symbol|default:"◎" }}</div>
+        <h1 class="planet-name">{{ planet|title }}</h1>
+        <p class="planet-subtitle">{{ info.represents|default:"Celestial Body" }}</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Key Information -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="info-card text-center">
+                <div class="info-title">Rashi (Sign)</div>
+                <div class="rashi-badge mt-3">
+                    <span style="font-size: 1.2rem;">{{ rashi_info.symbol|default:"☉" }}</span>
+                    <span>{{ rashi|title }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="info-card text-center">
+                <div class="info-title">House Position</div>
+                <div class="info-value mt-2">{{ house|ordinal }} House</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="info-card text-center">
+                <div class="info-title">Degree</div>
+                <div class="info-value mt-2">{{ data.degree_in_rashi|default:"0" }}°</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="info-card text-center">
+                <div class="info-title">Nakshatra</div>
+                <div class="info-value mt-2">{{ data.nakshatra|default:"-" }}</div>
+                {% if data.pada %}
+                <small class="text-muted">Pada {{ data.pada }}</small>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Interpretation -->
+        <div class="col-lg-8 mb-4">
+            <div class="interpretation-card">
+                <h3 class="interpretation-title">
+                    <i class="fas fa-star"></i>
+                    Interpretation
+                </h3>
+                <p class="interpretation-text">
+                    {{ interpretation }}
+                </p>
+                <hr class="my-4" style="border-color: rgba(244,194,194,0.3);">
+                <h4 class="mb-3" style="color: var(--dusty-rose);">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    What This Means for You
+                </h4>
+                <p class="interpretation-text">
+                    The placement of {{ planet|title }} in your {{ house|ordinal }} house indicates significant influences 
+                    in areas related to {{ rashi|title }} energy. This position suggests a natural alignment with 
+                    {{ info.represents|lower|default:"various aspects of life" }}.
+                </p>
+                <p class="interpretation-text mt-3">
+                    With {{ planet|title }} at {{ data.degree_in_rashi|default:"0" }}° in {{ rashi|title }}, 
+                    you may find that these themes are particularly prominent in your life journey. 
+                    {% if house == 1 %}This placement in your ascendant house makes it a defining feature of your personality.{% endif %}
+                    {% if house == 10 %}This placement in your 10th house strongly influences your career and public standing.{% endif %}
+                    {% if house == 7 %}This placement in your 7th house significantly affects your partnerships and relationships.{% endif %}
+                </p>
+            </div>
+        </div>
+
+        <!-- Planet Details -->
+        <div class="col-lg-4 mb-4">
+            <div class="info-card">
+                <h4 class="mb-4" style="color: var(--dusty-rose);">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Planet Details
+                </h4>
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="detail-label">Element</div>
+                        <div class="detail-value">{{ info.element|default:"Mixed" }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <div class="detail-label">House</div>
+                        <div class="detail-value">{{ house }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fas fa-compass"></i>
+                        </div>
+                        <div class="detail-label">Rashi Lord</div>
+                        <div class="detail-value">{{ rashi_info.lord|title|default:"-" }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fas fa-moon"></i>
+                        </div>
+                        <div class="detail-label">Nakshatra</div>
+                        <div class="detail-value">{{ data.nakshatra|default:"-" }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="house-section mt-4">
+                <h4 class="house-title">
+                    <i class="fas fa-compass me-2"></i>
+                    Explore More
+                </h4>
+                <div class="d-grid gap-2 mt-3">
+                    <a href="{% url 'birth_chart' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-chart-pie me-2"></i>Full Birth Chart
+                    </a>
+                    <a href="{% url 'house_details' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-home me-2"></i>House Details
+                    </a>
+                    <a href="{% url 'astro_dashboard' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-star me-2"></i>Astro Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
