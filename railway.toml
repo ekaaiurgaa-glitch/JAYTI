@@ -1,10 +1,6 @@
 [build]
 builder = "nixpacks"
 
-[build.nixpacks]
-# Install required system libraries for pyswisseph
-aptPackages = ["libsqlite3-dev", "sqlite3"]
-
 [deploy]
 startCommand = "python manage.py migrate && python manage.py create_initial_user && gunicorn jaytipargal.wsgi:application"
 healthcheckPath = "/"

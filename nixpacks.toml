@@ -1,16 +1,10 @@
 # Nixpacks configuration for Railway
 # Required system libraries for pyswisseph
 
-providers = ["python"]
-
+# Install apt packages during the setup phase (before Python install)
 [phases.setup]
-# Apt packages needed early
-aptPackages = ["python3", "python3-dev", "python3-venv", "python3-pip"]
-
-[phases.build]
-# Install SQLite development libraries via apt
 aptPackages = ["libsqlite3-dev", "sqlite3", "libsqlite3-0"]
 
+# Ensure pyswisseph can find the SQLite library
 [variables]
-# Ensure library path is set
 LD_LIBRARY_PATH = "/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"

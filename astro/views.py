@@ -3,8 +3,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import BirthChart, PlanetPosition, HouseDetail, Prediction
 from datetime import datetime, timedelta
-import swisseph as swe
 import math
+
+# Try to import swisseph - make astrology optional if library fails
+try:
+    import swisseph as swe
+    SWISSEPH_AVAILABLE = True
+except ImportError:
+    swe = None
+    SWISSEPH_AVAILABLE = False
 
 # Jayti's birth data
 JAYTI_BIRTH_DATA = {
@@ -20,16 +27,19 @@ JAYTI_BIRTH_DATA = {
 }
 
 # Vedic Astrology Constants
-PLANETS = {
-    swe.SUN: ('sun', 'Sun', '☉'),
-    swe.MOON: ('moon', 'Moon', '☽'),
-    swe.MARS: ('mars', 'Mars', '♂'),
-    swe.MERCURY: ('mercury', 'Mercury', '☿'),
-    swe.JUPITER: ('jupiter', 'Jupiter', '♃'),
-    swe.VENUS: ('venus', 'Venus', '♀'),
-    swe.SATURN: ('saturn', 'Saturn', '♄'),
-    swe.TRUE_NODE: ('rahu', 'Rahu', '☊'),
-}
+if SWISSEPH_AVAILABLE:
+    PLANETS = {
+        swe.SUN: ('sun', 'Sun', '☉'),
+        swe.MOON: ('moon', 'Moon', '☽'),
+        swe.MARS: ('mars', 'Mars', '♂'),
+        swe.MERCURY: ('mercury', 'Mercury', '☿'),
+        swe.JUPITER: ('jupiter', 'Jupiter', '♃'),
+        swe.VENUS: ('venus', 'Venus', '♀'),
+        swe.SATURN: ('saturn', 'Saturn', '♄'),
+        swe.TRUE_NODE: ('rahu', 'Rahu', '☊'),
+    }
+else:
+    PLANETS = {}
 
 # Calculate Ketu position (opposite to Rahu)
 def get_ketu_position(rahu_degree):
@@ -127,6 +137,8 @@ PLANET_INFO = {
 
 def calculate_julian_day(year, month, day, hour, minute, timezone_offset=5.5):
     """Calculate Julian Day Number for given date/time"""
+    if not SWISSEPH_AVAILABLE:
+        return 0
     decimal_hour = hour + minute / 60.0 - timezone_offset
     return swe.julday(year, month, day, decimal_hour)
 
@@ -154,6 +166,8 @@ def get_nakshatra_from_degree(degree):
 
 def calculate_houses(julian_day, latitude, longitude):
     """Calculate house cusps using Placidus system"""
+    if not SWISSEPH_AVAILABLE:
+        return [0] * 12
     houses = swe.houses_ex(julian_day, latitude, longitude, b'P')
     return houses[0]  # Array of 12 house cusps
 
@@ -161,6 +175,9 @@ def calculate_houses(julian_day, latitude, longitude):
 def calculate_planet_positions(julian_day):
     """Calculate all planet positions"""
     positions = {}
+    
+    if not SWISSEPH_AVAILABLE:
+        return positions
     
     for planet_id, (name, full_name, symbol) in PLANETS.items():
         result = swe.calc_ut(julian_day, planet_id)
@@ -203,6 +220,8 @@ def calculate_planet_positions(julian_day):
 
 def assign_planets_to_houses(planet_positions, house_cusps):
     """Assign planets to houses based on house cusps"""
+    if not SWISSEPH_AVAILABLE:
+        return {}
     ayanamsa = swe.get_ayanamsa_ut(swe.julday(1997, 2, 6, 17.5))
     
     # Convert house cusps to Vedic
@@ -495,7 +514,7 @@ def calculate_birth_chart():
             planet_positions[planet_name]['house'] = house
     
     # Determine ascendant (1st house cusp)
-    ayanamsa = swe.get_ayanamsa_ut(jd)
+    ayanamsa = swe.get_ayanamsa_ut(jd) if SWISSEPH_AVAILABLE else 0
     ascendant_degree = (house_cusps[0] - ayanamsa) % 360
     ascendant_rashi, _ = get_rashi_from_degree(ascendant_degree)
     
@@ -506,7 +525,7 @@ def calculate_birth_chart():
     houses = {}
     for i in range(12):
         house_num = i + 1
-        cusp_degree = (house_cusps[i] - ayanamsa) % 360
+        cusp_degree = (house_cusps[i] - ayanamsa) % 360 if SWISSEPH_AVAILABLE else 0
         rashi, _ = get_rashi_from_degree(cusp_degree)
         
         planets_in_house = [
@@ -538,6 +557,12 @@ def calculate_birth_chart():
 @login_required
 def astro_dashboard(request):
     """Astrology dashboard overview"""
+    if not SWISSEPH_AVAILABLE:
+        messages.warning(request, 'Astrology features are temporarily unavailable. Please try again later.')
+        return render(request, 'astro/astro_dashboard.html', {
+            'birth_data': JAYTI_BIRTH_DATA,
+            'swisseph_unavailable': True,
+        })
     chart_data = calculate_birth_chart()
     
     context = {

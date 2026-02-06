@@ -181,6 +181,13 @@ LOGGING = {
     },
 }
 
-# Create logs directory if it doesn't exist
+# Create logs directory if it doesn't exist (skip on Railway if read-only)
 LOGS_DIR = BASE_DIR / 'logs'
-LOGS_DIR.mkdir(exist_ok=True)
+try:
+    LOGS_DIR.mkdir(exist_ok=True)
+except OSError:
+    # Fallback to /tmp for Railway or other read-only filesystems
+    LOGS_DIR = Path('/tmp') / 'jaytipargal' / 'logs'
+    LOGS_DIR.mkdir(parents=True, exist_ok=True)
+    # Update logging file handler path
+    LOGGING['handlers']['file']['filename'] = LOGS_DIR / 'django.log'
