@@ -27,14 +27,19 @@ echo "🔐 Environment Check:"
 if [ -n "$SECRET_KEY" ]; then
     echo "✓ SECRET_KEY set"
 else
-    echo "❌ SECRET_KEY missing!"
-    exit 1
+    echo "⚠️  WARNING: SECRET_KEY not set - using fallback (not secure for production)"
 fi
 
 if [ -n "$DATABASE_URL" ]; then
     echo "✓ DATABASE_URL set"
 else
     echo "⚠️  WARNING: DATABASE_URL not set - will use SQLite fallback"
+fi
+
+if [ -n "$GEMINI_API_KEY" ]; then
+    echo "✓ GEMINI_API_KEY set"
+else
+    echo "⚠️  WARNING: GEMINI_API_KEY not set - AI features disabled"
 fi
 
 # Test Django imports

@@ -27,22 +27,30 @@ _default_hosts = 'localhost,127.0.0.1'
 ALLOWED_HOSTS_ENV = os.environ.get('ALLOWED_HOSTS', _default_hosts)
 ALLOWED_HOSTS = [h.strip() for h in ALLOWED_HOSTS_ENV.split(',') if h.strip()]
 
-# Add Railway domain pattern if not in DEBUG mode
+# Railway deployment: Add Railway domain patterns
 # Railway domains follow pattern: *.up.railway.app
-if not DEBUG:
-    # Ensure we have the Railway domain pattern
-    railway_domains = ['.up.railway.app', '*.up.railway.app']
-    for domain in railway_domains:
-        if domain not in ALLOWED_HOSTS:
-            ALLOWED_HOSTS.append(domain)
-    
-    # Also add any RAILWAY_STATIC_URL domain if present
-    railway_static_url = os.environ.get('RAILWAY_STATIC_URL', '')
-    if railway_static_url:
-        from urllib.parse import urlparse
-        parsed = urlparse(railway_static_url)
-        if parsed.hostname and parsed.hostname not in ALLOWED_HOSTS:
-            ALLOWED_HOSTS.append(parsed.hostname)
+railway_domains = ['.up.railway.app', '*.up.railway.app']
+for domain in railway_domains:
+    if domain not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(domain)
+
+# Also add any RAILWAY_STATIC_URL domain if present
+railway_static_url = os.environ.get('RAILWAY_STATIC_URL', '')
+if railway_static_url:
+    from urllib.parse import urlparse
+    parsed = urlparse(railway_static_url)
+    if parsed.hostname and parsed.hostname not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(parsed.hostname)
+
+# Additional Railway environment variables
+railway_public_domain = os.environ.get('RAILWAY_PUBLIC_DOMAIN', '')
+if railway_public_domain and railway_public_domain not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(railway_public_domain)
+
+# If running on Railway without explicit ALLOWED_HOSTS, allow all (for debugging)
+# In production, you should set explicit ALLOWED_HOSTS
+if os.environ.get('RAILWAY_ENVIRONMENT') and not os.environ.get('ALLOWED_HOSTS'):
+    ALLOWED_HOSTS.append('*')
 
 # Application definition
 INSTALLED_APPS = [
