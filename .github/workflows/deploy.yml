@@ -3,20 +3,16 @@ name: Deploy to Railway
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # Only run if RAILWAY_TOKEN is set
+    if: ${{ secrets.RAILWAY_TOKEN != '' }}
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
 
       - name: Install Railway CLI
         run: npm install -g @railway/cli
@@ -24,4 +20,26 @@ jobs:
       - name: Deploy to Railway
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --service jayti
+        run: |
+          railway up --service jayti
+          
+  manual-deploy:
+    runs-on: ubuntu-latest
+    # Skip if no token - just verify the build
+    if: ${{ secrets.RAILWAY_TOKEN == '' }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Verify Build
+        run: |
+          pip install -r requirements.txt
+          cd jaytipargal
+          python manage.py check --settings=jaytipargal.settings
+          echo "✅ Build verified - Ready for manual deployment to Railway"

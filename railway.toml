@@ -1,14 +1,13 @@
 # Railway Deployment Configuration
-# This file configures how Railway builds and deploys your app
 
 [build]
 builder = "nixpacks"
 
 [deploy]
-# Startup command with debugging and health checks
-startCommand = "bash railway_startup.sh"
+# Use absolute path to ensure correct directory
+startCommand = "/bin/bash railway_startup.sh"
 
-# Health check endpoint - must return 200 OK
+# Health check endpoint
 healthcheckPath = "/health/"
 healthcheckTimeout = 300
 
@@ -16,7 +15,6 @@ healthcheckTimeout = 300
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 5
 
-# Enable Railway debugger logs
 [deploy.env]
 RAILWAY_DEBUG = "true"
 PYTHONUNBUFFERED = "1"

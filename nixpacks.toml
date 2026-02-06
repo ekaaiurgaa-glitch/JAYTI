@@ -1,5 +1,5 @@
 # Nixpacks configuration for Railway
-# Minimal config to avoid Python conflicts
+# Django app with manage.py at root level
 
 [phases.setup]
 nixPkgs = ["python311", "postgresql_16.dev"]
@@ -13,7 +13,10 @@ cmds = [
 ]
 
 [phases.build]
-cmds = ["echo 'Build complete'"]
+cmds = [
+    ". /opt/venv/bin/activate",
+    "echo 'Build complete - manage.py at root level'"
+]
 
 [start]
-cmd = "bash railway_startup.sh"
+cmd = "/bin/bash railway_startup.sh"
