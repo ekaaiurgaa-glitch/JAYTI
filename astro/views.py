@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import BirthChart, PlanetPosition, HouseDetail, Prediction
 from datetime import datetime, timedelta
-import swisseph as swe
+import pyswisseph as swe
 import math
 
 # Jayti's birth data
