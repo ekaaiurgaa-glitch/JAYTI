@@ -176,6 +176,10 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # WhiteNoise for serving static files in production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# Ensure WhiteNoise middleware is properly configured
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_AUTOREFRESH = False
+
 # Media files
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
