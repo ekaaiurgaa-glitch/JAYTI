@@ -115,16 +115,23 @@ def get_database_config():
     
     if database_url:
         # Production: Use PostgreSQL with Railway
-        # Parse the URL and handle SSL properly
+        # Parse the URL - Railway's internal connections don't need SSL
         config = dj_database_url.parse(
             database_url,
             conn_max_age=600,
-            ssl_require=True,  # This handles SSL properly for Railway
         )
+        
+        # Only add SSL for external connections (not Railway internal)
+        # Railway's internal networking handles SSL automatically
+        if os.environ.get('RAILWAY_ENVIRONMENT') != 'production':
+            # For external connections, use sslmode
+            if 'OPTIONS' not in config:
+                config['OPTIONS'] = {}
+            config['OPTIONS']['sslmode'] = 'require'
         
         return config
     else:
-        # Development: Use SQLite
+        # Development/CI: Use SQLite
         return {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
