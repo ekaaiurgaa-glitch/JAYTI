@@ -52,6 +52,13 @@ if railway_public_domain and railway_public_domain not in ALLOWED_HOSTS:
 if os.environ.get('RAILWAY_ENVIRONMENT') and not os.environ.get('ALLOWED_HOSTS'):
     ALLOWED_HOSTS.append('*')
 
+# CSRF Trusted Origins (required for Django 4.0+ when DEBUG=False)
+CSRF_TRUSTED_ORIGINS = []
+for host in ALLOWED_HOSTS:
+    if host != '*':
+        CSRF_TRUSTED_ORIGINS.append(f'https://{host}')
+        CSRF_TRUSTED_ORIGINS.append(f'http://{host}')
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
