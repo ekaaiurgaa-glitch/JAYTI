@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Welcome - JaytiPargal.in{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/custom.css' %}">
 <style>
     .login-page {
         min-height: 100vh;
@@ -10,29 +12,29 @@
         align-items: center;
         justify-content: center;
         background: linear-gradient(135deg, 
-            rgba(244, 194, 194, 0.1) 0%, 
-            rgba(230, 230, 250, 0.15) 50%, 
-            rgba(240, 255, 240, 0.1) 100%);
+            rgba(232, 180, 184, 0.08) 0%, 
+            rgba(230, 230, 250, 0.12) 50%, 
+            rgba(240, 245, 240, 0.08) 100%);
         position: relative;
         overflow: hidden;
     }
     
     .login-container {
         display: grid;
-        grid-template-columns: 380px 1fr;
-        max-width: 1200px;
+        grid-template-columns: 360px 1fr;
+        max-width: 1100px;
         width: 95%;
-        min-height: 600px;
+        min-height: 550px;
         background: white;
-        border-radius: 24px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        border-radius: 16px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.08);
         overflow: hidden;
     }
     
     @media (max-width: 992px) {
         .login-container {
             grid-template-columns: 1fr;
-            max-width: 500px;
+            max-width: 420px;
         }
         .login-visual {
             display: none;
@@ -40,7 +42,7 @@
     }
     
     .login-form-section {
-        padding: 3rem;
+        padding: 2rem;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -52,7 +54,7 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        padding: 3rem;
+        padding: 2rem;
         color: white;
         overflow: hidden;
     }
@@ -88,7 +90,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, rgba(244,194,194,0.85), rgba(230,230,250,0.85));
+        background: linear-gradient(135deg, rgba(232,180,184,0.88), rgba(230,230,250,0.88));
         z-index: 1;
     }
     
@@ -99,17 +101,17 @@
     
     .daily-thought {
         font-family: 'Playfair Display', serif;
-        font-size: 1.5rem;
+        font-size: 1.25rem;
         font-style: italic;
-        line-height: 1.6;
+        line-height: 1.5;
         text-align: center;
-        text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        margin-bottom: 2rem;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        margin-bottom: 1.5rem;
     }
     
     .thought-author {
         font-family: 'Lato', sans-serif;
-        font-size: 1rem;
+        font-size: 0.9rem;
         font-style: normal;
         opacity: 0.9;
     }
@@ -120,68 +122,69 @@
     }
     
     .time-greeting {
-        font-size: 1.25rem;
+        font-size: 1.1rem;
         font-weight: 300;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
     }
     
     .time-message {
-        font-size: 0.9rem;
+        font-size: 0.8rem;
         opacity: 0.9;
     }
     
     .current-time {
-        font-size: 3rem;
+        font-size: 2.5rem;
         font-weight: 300;
         font-family: 'Playfair Display', serif;
-        margin: 1rem 0;
+        margin: 0.5rem 0;
     }
     
     .current-date {
-        font-size: 1rem;
+        font-size: 0.9rem;
         opacity: 0.9;
     }
     
     .login-header {
         text-align: center;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
     
     .login-header h1 {
-        font-size: 2rem;
+        font-size: 1.75rem;
         color: var(--dusty-rose);
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
     }
     
     .login-header p {
         color: var(--muted-mauve);
-        font-size: 0.95rem;
+        font-size: 0.85rem;
     }
     
     .form-floating {
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
     }
     
     .form-floating input {
-        border: 2px solid rgba(244,194,194,0.3);
-        border-radius: 12px;
+        border: 1px solid rgba(232,180,184,0.4);
+        border-radius: 8px;
     }
     
     .form-floating label {
         color: var(--muted-mauve);
+        font-size: 0.9rem;
     }
     
     .btn-login {
         width: 100%;
-        padding: 1rem;
-        font-size: 1.1rem;
-        margin-top: 1rem;
+        padding: 0.75rem;
+        font-size: 1rem;
+        margin-top: 0.5rem;
     }
     
     .login-footer {
         text-align: center;
-        margin-top: 2rem;
-        font-size: 0.85rem;
+        margin-top: 1.5rem;
+        font-size: 0.8rem;
         color: var(--muted-mauve);
     }
     
@@ -190,19 +193,15 @@
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
-        margin-top: 1rem;
-        padding: 0.75rem;
-        background: rgba(244,194,194,0.1);
-        border-radius: 8px;
-        font-size: 0.8rem;
+        margin-top: 0.75rem;
+        padding: 0.5rem;
+        background: rgba(232,180,184,0.08);
+        border-radius: 6px;
+        font-size: 0.75rem;
         color: var(--muted-mauve);
     }
     
-    .privacy-notice i {
-        color: var(--blush-rose);
-    }
-    
-    /* Birthday Overlay */
+    /* Birthday Overlay - No Emoji, Uses Icon */
     .birthday-overlay {
         position: fixed;
         top: 0;
@@ -210,78 +209,100 @@
         right: 0;
         bottom: 0;
         background: linear-gradient(135deg, 
-            rgba(244,194,194,0.98), 
-            rgba(230,230,250,0.98),
-            rgba(255,218,185,0.95));
+            rgba(232,180,184,0.97), 
+            rgba(230,230,250,0.97),
+            rgba(255,212,196,0.95));
         z-index: 9999;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 2rem;
-        animation: fadeIn 1s ease;
+        padding: 1.5rem;
+        animation: fadeIn 0.8s ease;
     }
     
     .birthday-content {
         text-align: center;
-        max-width: 700px;
+        max-width: 600px;
         color: white;
     }
     
-    .birthday-icon {
-        font-size: 5rem;
-        margin-bottom: 1.5rem;
-        animation: bounce 2s infinite;
+    /* SVG Cake Icon Instead of Emoji */
+    .birthday-icon-wrapper {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 1rem;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: gentle-bounce 3s ease-in-out infinite;
     }
     
-    @keyframes bounce {
+    .birthday-icon-wrapper i {
+        font-size: 2rem;
+        color: white;
+    }
+    
+    @keyframes gentle-bounce {
         0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-20px); }
+        50% { transform: translateY(-8px); }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
     
     .birthday-title {
-        font-size: 3.5rem;
-        margin-bottom: 1.5rem;
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
         color: white;
-        text-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        text-shadow: 0 2px 15px rgba(0,0,0,0.1);
     }
     
     .birthday-subtitle {
-        font-size: 1.5rem;
-        margin-bottom: 2rem;
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
         opacity: 0.95;
     }
     
     .birthday-message {
-        font-size: 1.1rem;
-        line-height: 2;
-        margin-bottom: 2.5rem;
-        background: rgba(255,255,255,0.2);
-        padding: 2rem;
-        border-radius: 16px;
+        font-size: 0.95rem;
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+        background: rgba(255,255,255,0.15);
+        padding: 1.25rem;
+        border-radius: 12px;
         backdrop-filter: blur(10px);
+        text-align: left;
+    }
+    
+    .birthday-message p {
+        margin-bottom: 0.75rem;
     }
     
     .birthday-signature {
         font-family: 'Dancing Script', cursive;
-        font-size: 2.5rem;
-        margin-bottom: 2rem;
+        font-size: 1.75rem;
+        margin-bottom: 1.5rem;
     }
     
     .btn-birthday {
         background: white;
         color: var(--dusty-rose);
         border: none;
-        padding: 1rem 3rem;
-        border-radius: 30px;
-        font-size: 1.1rem;
+        padding: 0.75rem 2rem;
+        border-radius: 25px;
+        font-size: 1rem;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
     }
     
     .btn-birthday:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
     }
     
     .hidden {
@@ -291,26 +312,29 @@
     /* Floating particles */
     .particle {
         position: absolute;
-        width: 10px;
-        height: 10px;
-        background: rgba(255,255,255,0.6);
+        width: 8px;
+        height: 8px;
+        background: rgba(255,255,255,0.5);
         border-radius: 50%;
         animation: float-up 4s ease-in-out infinite;
     }
     
     @keyframes float-up {
-        0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
-        50% { transform: translateY(-100px) rotate(180deg); opacity: 1; }
+        0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.5; }
+        50% { transform: translateY(-80px) rotate(180deg); opacity: 0.9; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Birthday Overlay (shown only on Feb 6) -->
+<!-- Birthday Overlay (shown only on Feb 6) - No Emoji, Uses FontAwesome Icon -->
 {% if is_birthday %}
 <div id="birthdayOverlay" class="birthday-overlay">
     <div class="birthday-content">
-        <div class="birthday-icon">🎂</div>
+        <!-- SVG Icon Wrapper Instead of Emoji -->
+        <div class="birthday-icon-wrapper">
+            <i class="fas fa-birthday-cake"></i>
+        </div>
         <h1 class="birthday-title">Happy Birthday, Jayti!</h1>
         <p class="birthday-subtitle">29 years of strength, resilience, and grace</p>
         
@@ -363,38 +387,38 @@
             </div>
             
             {% if error %}
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="font-size: 0.85rem; padding: 0.5rem;">
                 {{ error }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" style="padding: 0.4rem;"></button>
             </div>
             {% endif %}
             
             <form method="post" action="{% url 'login' %}">
                 {% csrf_token %}
                 
-                <div class="form-floating mb-3">
+                <div class="form-floating mb-2">
                     <input type="text" class="form-control" id="username" name="username" placeholder="Enter your access code" required>
-                    <label for="username"><i class="fas fa-key me-2"></i>Access Code</label>
+                    <label for="username"><i class="fas fa-key me-1"></i>Access Code</label>
                 </div>
                 
-                <div class="form-floating mb-3">
+                <div class="form-floating mb-2">
                     <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
-                    <label for="password"><i class="fas fa-lock me-2"></i>Password</label>
+                    <label for="password"><i class="fas fa-lock me-1"></i>Password</label>
                 </div>
                 
                 <button type="submit" class="btn btn-primary btn-login">
-                    <i class="fas fa-sign-in-alt me-2"></i>Enter
+                    <i class="fas fa-sign-in-alt me-1"></i>Enter
                 </button>
             </form>
             
             <div class="privacy-notice">
                 <i class="fas fa-shield-alt"></i>
-                <span>Your data stays private. No external services. No tracking.</span>
+                <span>Your data stays private. No external tracking.</span>
             </div>
             
             <div class="login-footer">
                 <p>Created with care for Jayti's journey</p>
-                <p class="font-script mt-2" style="color: var(--dusty-rose);">February 6, 2026</p>
+                <p class="font-script mt-1" style="color: var(--dusty-rose);">February 6, 2026</p>
             </div>
         </div>
         

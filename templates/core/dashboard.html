@@ -1,20 +1,25 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Dashboard - JaytiPargal.in{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/custom.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="container py-5">
-    <!-- Vivek's Emotional Greeting (First login of the day) -->
+<div class="container py-4 dashboard-container">
+    <!-- Vivek's Message (Birthday Only) -->
     {% if show_vivek_message %}
-    <div class="row mb-5 animate-fade-in" id="vivekGreeting">
+    <div class="row mb-3 animate-fade-in" id="vivekGreeting">
         <div class="col-lg-10 mx-auto">
-            <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, rgba(244,194,194,0.15), rgba(230,230,250,0.15));">
-                <div class="card-body p-5 position-relative">
+            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, rgba(232,180,184,0.12), rgba(230,230,250,0.12));">
+                <div class="card-body p-4 position-relative">
                     <button type="button" class="btn-close position-absolute top-0 end-0 m-3" onclick="dismissVivekGreeting()" aria-label="Close"></button>
                     <div class="text-center">
-                        <i class="fas fa-heart text-blush mb-3" style="font-size: 2.5rem;"></i>
-                        <h2 class="font-script mb-4" style="font-size: 2rem; color: var(--dusty-rose);">My Prayer for You</h2>
-                        <div class="text-start mx-auto" style="max-width: 600px; line-height: 2;">
+                        <i class="fas fa-heart text-blush mb-2" style="font-size: 2rem;"></i>
+                        <h2 class="font-script mb-3" style="font-size: 1.75rem; color: var(--dusty-rose);">My Prayer for You</h2>
+                        <div class="text-start mx-auto" style="max-width: 600px; line-height: 1.8; font-size: 0.95rem;">
                             <p class="lead">Dear {{ display_name|default:"Jayti" }},</p>
                             <p>
                                 As you begin this day, I want you to remember: you are capable of extraordinary things. 
@@ -22,16 +27,9 @@
                             </p>
                             <p>
                                 May today bring you moments of clarity, peace, and small victories. 
-                                When challenges arise, know that you have the tools here to navigate them—
-                                your Goals for direction, your Diary for reflection, your Notes for clarity, 
-                                and your Astro for cosmic guidance.
+                                When challenges arise, know that you have the tools here to navigate them.
                             </p>
-                            <p>
-                                Whatever today holds, meet it with the knowledge that you are worthy of 
-                                happiness, success, and love—not because you've earned it through struggle, 
-                                but simply because you exist.
-                            </p>
-                            <p class="font-script mt-4" style="font-size: 1.5rem; color: var(--dusty-rose);">
+                            <p class="font-script mt-3" style="font-size: 1.25rem; color: var(--dusty-rose);">
                                 With hope for your flourishing,<br>
                                 Vivek
                             </p>
@@ -44,35 +42,35 @@
     {% endif %}
 
     <!-- Welcome Section -->
-    <div class="row mb-5">
+    <div class="row mb-3">
         <div class="col-lg-8 mx-auto text-center animate-fade-in">
-            <h1 class="display-5 mb-3">Welcome, {{ display_name|default:"Jayti" }}</h1>
-            <p class="lead text-mauve">
-                This is your personal sanctuary—five pillars to support your journey of growth and healing.
+            <h1 class="display-6 mb-2">Welcome, {{ display_name|default:"Jayti" }}</h1>
+            <p class="text-mauve mb-1" style="font-size: 0.95rem;">
+                Your personal sanctuary for growth and healing.
             </p>
             {% if time_greeting %}
-            <p class="text-muted">
-                <i class="fas fa-sun me-2 text-blush"></i>{{ time_greeting.message }}
+            <p class="text-muted" style="font-size: 0.85rem;">
+                <i class="fas fa-sun me-1 text-blush"></i>{{ time_greeting.message }}
             </p>
             {% endif %}
         </div>
     </div>
     
     <!-- Five Pillars -->
-    <div class="row g-4">
+    <div class="row g-3">
         <!-- Karma - Goals -->
         <div class="col-md-4">
             <a href="{% url 'goal_list' %}" class="text-decoration-none">
-                <div class="card h-100 text-center p-4">
+                <div class="card h-100 text-center p-3">
                     <div class="pillar-icon pillar-karma mx-auto">
-                        <i class="fas fa-bullseye text-white"></i>
+                        <i class="fas fa-bullseye"></i>
                     </div>
-                    <h4 class="mb-2">Karma</h4>
-                    <p class="text-mauve mb-3">Action & Duty</p>
-                    <p class="text-muted small">Transform intention into structured execution</p>
+                    <h5 class="mb-1">Karma</h5>
+                    <p class="text-mauve mb-1" style="font-size: 0.8rem;">Action & Duty</p>
+                    <p class="text-muted small mb-2" style="font-size: 0.75rem;">Transform intention into structured execution</p>
                     <div class="mt-auto">
-                        <span class="badge bg-primary">{{ active_goals }} Active Goals</span>
-                        <span class="badge bg-secondary">{{ pending_tasks }} Pending Tasks</span>
+                        <span class="badge bg-primary" style="font-size: 0.7rem;">{{ active_goals }} Active</span>
+                        <span class="badge bg-secondary" style="font-size: 0.7rem;">{{ pending_tasks }} Tasks</span>
                     </div>
                 </div>
             </a>
@@ -81,16 +79,16 @@
         <!-- Dharma - Astro -->
         <div class="col-md-4">
             <a href="{% url 'astro_dashboard' %}" class="text-decoration-none">
-                <div class="card h-100 text-center p-4">
+                <div class="card h-100 text-center p-3">
                     <div class="pillar-icon pillar-dharma mx-auto">
-                        <i class="fas fa-star text-white"></i>
+                        <i class="fas fa-star"></i>
                     </div>
-                    <h4 class="mb-2">Dharma</h4>
-                    <p class="text-mauve mb-3">Righteous Path</p>
-                    <p class="text-muted small">Cosmic guidance for decision timing</p>
+                    <h5 class="mb-1">Dharma</h5>
+                    <p class="text-mauve mb-1" style="font-size: 0.8rem;">Righteous Path</p>
+                    <p class="text-muted small mb-2" style="font-size: 0.75rem;">Cosmic guidance for decision timing</p>
                     <div class="mt-auto">
-                        <span class="badge bg-info">Vedic Birth Chart</span>
-                        <span class="badge bg-secondary">90-Day Guidance</span>
+                        <span class="badge bg-info" style="font-size: 0.7rem;">Birth Chart</span>
+                        <span class="badge bg-secondary" style="font-size: 0.7rem;">90-Day Guide</span>
                     </div>
                 </div>
             </a>
@@ -99,16 +97,16 @@
         <!-- Doubt - AI -->
         <div class="col-md-4">
             <a href="{% url 'ai_chat' %}" class="text-decoration-none">
-                <div class="card h-100 text-center p-4">
+                <div class="card h-100 text-center p-3">
                     <div class="pillar-icon pillar-doubt mx-auto">
-                        <i class="fas fa-robot text-white"></i>
+                        <i class="fas fa-comments"></i>
                     </div>
-                    <h4 class="mb-2">Doubt</h4>
-                    <p class="text-mauve mb-3">Inquiry & Question</p>
-                    <p class="text-muted small">Resolve uncertainty through dialogue</p>
+                    <h5 class="mb-1">Doubt</h5>
+                    <p class="text-mauve mb-1" style="font-size: 0.8rem;">Inquiry & Question</p>
+                    <p class="text-muted small mb-2" style="font-size: 0.75rem;">Resolve uncertainty through dialogue</p>
                     <div class="mt-auto">
-                        <span class="badge bg-success">Ask Jayti</span>
-                        <span class="badge bg-secondary">Private & Secure</span>
+                        <span class="badge bg-success" style="font-size: 0.7rem;">Ask Jayti</span>
+                        <span class="badge bg-secondary" style="font-size: 0.7rem;">Private</span>
                     </div>
                 </div>
             </a>
@@ -117,16 +115,16 @@
         <!-- Memory - Notes -->
         <div class="col-md-6">
             <a href="{% url 'note_list' %}" class="text-decoration-none">
-                <div class="card h-100 text-center p-4">
+                <div class="card h-100 text-center p-3">
                     <div class="pillar-icon pillar-memory mx-auto">
-                        <i class="fas fa-sticky-note text-white"></i>
+                        <i class="fas fa-sticky-note"></i>
                     </div>
-                    <h4 class="mb-2">Memory</h4>
-                    <p class="text-mauve mb-3">Retention</p>
-                    <p class="text-muted small">Externalize cognitive load for mental clarity</p>
+                    <h5 class="mb-1">Memory</h5>
+                    <p class="text-mauve mb-1" style="font-size: 0.8rem;">Retention</p>
+                    <p class="text-muted small mb-2" style="font-size: 0.75rem;">Externalize cognitive load for mental clarity</p>
                     <div class="mt-auto">
-                        <span class="badge bg-warning text-dark">{{ recent_notes }} Notes</span>
-                        <span class="badge bg-secondary">Tag-based Organization</span>
+                        <span class="badge bg-warning text-dark" style="font-size: 0.7rem;">{{ recent_notes }} Notes</span>
+                        <span class="badge bg-secondary" style="font-size: 0.7rem;">Organized</span>
                     </div>
                 </div>
             </a>
@@ -135,50 +133,53 @@
         <!-- Thoughts - Diary -->
         <div class="col-md-6">
             <a href="{% url 'diary_overview' %}" class="text-decoration-none">
-                <div class="card h-100 text-center p-4">
+                <div class="card h-100 text-center p-3">
                     <div class="pillar-icon pillar-thoughts mx-auto">
-                        <i class="fas fa-book text-white"></i>
+                        <i class="fas fa-book"></i>
                     </div>
-                    <h4 class="mb-2">Thoughts</h4>
-                    <p class="text-mauve mb-3">Reflection</p>
-                    <p class="text-muted small">Process emotional experience through narrative</p>
+                    <h5 class="mb-1">Thoughts</h5>
+                    <p class="text-mauve mb-1" style="font-size: 0.8rem;">Reflection</p>
+                    <p class="text-muted small mb-2" style="font-size: 0.75rem;">Process emotional experience through narrative</p>
                     <div class="mt-auto">
-                        <span class="badge bg-danger">{{ recent_diary }} Entries</span>
-                        <span class="badge bg-secondary">Multi-modal Input</span>
+                        <span class="badge bg-danger" style="font-size: 0.7rem;">{{ recent_diary }} Entries</span>
+                        <span class="badge bg-secondary" style="font-size: 0.7rem;">Private</span>
                     </div>
                 </div>
             </a>
         </div>
     </div>
     
-    <!-- Daily Inspiration -->
-    <div class="row mt-5">
+    <!-- Content Spacer for Short Pages -->
+    <div class="content-spacer"></div>
+    
+    <!-- Daily Inspiration (Fills Bottom Space) -->
+    <div class="row mt-3">
         <div class="col-lg-8 mx-auto">
-            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, rgba(244,194,194,0.1), rgba(230,230,250,0.1));">
-                <div class="card-body text-center p-5">
-                    <i class="fas fa-quote-left text-blush mb-3" style="font-size: 2rem;"></i>
-                    <blockquote class="blockquote">
-                        {% if daily_thought %}
-                        <p class="font-script" style="font-size: 1.5rem; color: var(--warm-charcoal);">
-                            "{{ daily_thought.content }}"
-                        </p>
-                        <footer class="blockquote-footer mt-3">
-                            {{ daily_thought.author|default:"Unknown" }}
-                        </footer>
-                        {% else %}
-                        <p class="font-script" style="font-size: 1.5rem; color: var(--warm-charcoal);">
-                            "The lotus blooms most beautifully from the deepest and thickest mud."
-                        </p>
-                        <footer class="blockquote-footer mt-3">
-                            Buddhist Proverb
-                        </footer>
-                        {% endif %}
-                    </blockquote>
-                </div>
+            <div class="daily-thought-card">
+                <blockquote class="blockquote mb-0">
+                    {% if daily_thought %}
+                    <p class="font-display mb-2" style="font-size: 1.1rem; color: var(--warm-charcoal); line-height: 1.5;">
+                        {{ daily_thought.content }}
+                    </p>
+                    <footer class="blockquote-footer" style="font-size: 0.8rem;">
+                        {{ daily_thought.author|default:"Unknown" }}
+                    </footer>
+                    {% else %}
+                    <p class="font-display mb-2" style="font-size: 1.1rem; color: var(--warm-charcoal);">
+                        The lotus blooms most beautifully from the deepest and thickest mud.
+                    </p>
+                    <footer class="blockquote-footer" style="font-size: 0.8rem;">
+                        Buddhist Proverb
+                    </footer>
+                    {% endif %}
+                </blockquote>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Page Fill Element (Floral Gradient at Bottom) -->
+<div class="page-fill-element"></div>
 {% endblock %}
 
 {% block extra_js %}
@@ -187,10 +188,10 @@
         const greeting = document.getElementById('vivekGreeting');
         if (greeting) {
             greeting.style.opacity = '0';
-            greeting.style.transition = 'opacity 0.5s ease';
+            greeting.style.transition = 'opacity 0.3s ease';
             setTimeout(() => {
                 greeting.style.display = 'none';
-            }, 500);
+            }, 300);
         }
     }
     
