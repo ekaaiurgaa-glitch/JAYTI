@@ -6,6 +6,17 @@
 
 ---
 
+## 🔐 INITIAL LOGIN CREDENTIALS
+
+**Default User (Auto-Created):**
+- **Username:** `jayati`
+- **Password:** `jayati2026`
+
+**Password can be changed after first login via:**  
+Profile → Change Password
+
+---
+
 ## 📋 QUICK DEPLOYMENT CHECKLIST
 
 ### 1. Environment Variables (Set in Railway/Render Dashboard)
@@ -83,11 +94,23 @@ Go to Project Settings → Environment Variables and add ALL variables from chec
 python manage.py migrate
 ```
 
-### Step 7: Create Superuser (Jayti's Login)
+### Step 7: Create Initial User (Jayti's Login)
+**Option A: Using the custom command (RECOMMENDED)**
+```bash
+python manage.py create_initial_user
+```
+
+**Option B: Manual creation**
 ```bash
 python manage.py createsuperuser
-# Username: jayti (or her preferred login code)
-# Password: [secure password]
+# Username: jayati
+# Password: jayati2026
+```
+
+**Output:**
+```
+Successfully created user "jayati" with password "jayati2026"
+Jayti can change her password after first login from Profile settings.
 ```
 
 ### Step 8: Load Initial Data (Optional)
@@ -107,11 +130,29 @@ python manage.py collectstatic --noinput
 ### Test These URLs:
 - [ ] https://jaytibirthday.in (Main site)
 - [ ] https://www.jaytibirthday.in (WWW redirect)
-- [ ] Login page loads with flower slideshow
+- [ ] Login with `jayati` / `jayati2026`
 - [ ] Dashboard shows 5 pillars
+- [ ] Profile page allows password change
 - [ ] AI Chat responds with context
 - [ ] Diary auto-saves offline
 - [ ] Astrology shows birth chart
+
+---
+
+## 🔐 PASSWORD CHANGE AFTER FIRST LOGIN
+
+**Jayti can change her password anytime:**
+1. Login with `jayati` / `jayati2026`
+2. Click on her name in top navigation → **Profile**
+3. Click **"Change Password"** button
+4. Enter current password: `jayati2026`
+5. Enter new password (twice)
+6. Click **Save**
+
+**Or direct URL:**
+```
+https://jaytibirthday.in/password-change/
+```
 
 ---
 
@@ -138,25 +179,36 @@ python manage.py collectstatic --noinput
 - Check server date: `date` command in console
 - Should show Feb 6, 2026 for message to appear
 
+### Can't Login:
+- Verify user was created: `python manage.py shell` → `User.objects.filter(username='jayati').exists()`
+- Reset password if needed: `python manage.py changepassword jayati`
+
 ---
 
 ## 📦 FILES INCLUDED IN DEPLOYMENT
 
 ```
 jaytipargal/
-├── core/              # User auth, dashboard, context processors
-├── ai_chat/           # Gemini AI with Mentor Mode
-├── astro/             # Vedic astrology with Dasha system
-├── diary/             # Multi-modal diary with offline support
-├── goals/             # AI-powered goal management
-├── notes/             # Note-taking system
-├── static/            # CSS, JS, Service Worker
-│   ├── css/custom.css # Premium styling
-│   └── js/sw.js       # Offline PWA support
-├── templates/         # All HTML templates
-├── requirements.txt   # Python dependencies
-├── manage.py          # Django management
-└── DEPLOYMENT.md      # This file
+├── core/                          # User auth, dashboard, context processors
+│   ├── management/
+│   │   └── commands/
+│   │       └── create_initial_user.py  # Creates jayati/jayati2026
+│   └── fixtures/
+│       ├── initial_data.json      # Quotes & prompts
+│       └── initial_user.json      # Default user template
+├── ai_chat/                       # Gemini AI with Mentor Mode
+├── astro/                         # Vedic astrology with Dasha system
+├── diary/                         # Multi-modal diary with offline support
+├── goals/                         # AI-powered goal management
+├── notes/                         # Note-taking system
+├── static/                        # CSS, JS, Service Worker
+│   ├── css/custom.css            # Premium styling
+│   └── js/sw.js                  # Offline PWA support
+├── templates/                     # All HTML templates
+├── requirements.txt               # Python dependencies
+├── manage.py                      # Django management
+├── DEPLOYMENT.md                  # This file
+└── README.md                      # Project documentation
 ```
 
 ---
@@ -167,6 +219,10 @@ jaytipargal/
 1. Birthday overlay with Vivek's message
 2. Special visual animations
 3. Her personal dashboard
+
+**Login Credentials:**
+- Username: `jayati`
+- Password: `jayati2026`
 
 **The gift is ready. 🌸**
 
@@ -179,5 +235,6 @@ If deployment fails:
 2. Verify PostgreSQL is connected
 3. Check application logs in dashboard
 4. Ensure `DEBUG=False` for production
+5. Verify user created: `python manage.py shell` → `from django.contrib.auth.models import User; User.objects.all()`
 
 **Repository:** https://github.com/ekaaiurgaa-glitch/JAYTI
