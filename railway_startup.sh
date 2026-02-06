@@ -11,7 +11,7 @@ echo "=========================================="
 # Debug: Print environment info
 echo ""
 echo "📋 Environment Info:"
-echo "  Python Version: $(python --version)"
+echo "  Python Version: $(python3.11 --version 2>/dev/null || python --version)"
 echo "  Working Directory: $(pwd)"
 echo "  PATH: $PATH"
 
@@ -56,7 +56,7 @@ fi
 # Run Railway Debugger
 echo ""
 echo "🔍 Running Railway Deployment Debugger..."
-python manage.py railway_debug || {
+python3.11 manage.py railway_debug || {
     echo ""
     echo "❌ Deployment checks failed! See errors above."
     exit 1
@@ -65,14 +65,14 @@ python manage.py railway_debug || {
 # Collect static files
 echo ""
 echo "📦 Collecting Static Files..."
-python manage.py collectstatic --noinput --clear || {
+python3.11 manage.py collectstatic --noinput --clear || {
     echo "⚠ Static collection had issues, continuing..."
 }
 
 # Run migrations
 echo ""
 echo "🗄️  Running Database Migrations..."
-python manage.py migrate --noinput || {
+python3.11 manage.py migrate --noinput || {
     echo "❌ Migration failed!"
     exit 1
 }
@@ -80,7 +80,7 @@ python manage.py migrate --noinput || {
 # Create initial user if needed
 echo ""
 echo "👤 Creating Initial User..."
-python manage.py create_initial_user || {
+python3.11 manage.py create_initial_user || {
     echo "⚠ Initial user creation had issues, continuing..."
 }
 
