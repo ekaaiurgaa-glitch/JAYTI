@@ -1,395 +1,145 @@
 {% extends 'base.html' %}
 
-{% block title %}Astrology Dashboard - jayti{% endblock %}
-
-{% block extra_css %}
-<style>
-    .astro-hero {
-        background: linear-gradient(135deg, rgba(244,194,194,0.15), rgba(230,230,250,0.15));
-        border-radius: 20px;
-        padding: 2.5rem;
-        margin-bottom: 2rem;
-        border: 1px solid rgba(244,194,194,0.3);
-    }
-    
-    .astro-card {
-        background: white;
-        border-radius: 16px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-        transition: all 0.3s ease;
-        height: 100%;
-    }
-    
-    .astro-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-    }
-    
-    .astro-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-        background: linear-gradient(135deg, var(--blush-rose), var(--dusty-rose));
-        color: white;
-    }
-    
-    .ascendant-display {
-        text-align: center;
-        padding: 2rem;
-        background: linear-gradient(135deg, rgba(244,194,194,0.1), rgba(230,230,250,0.1));
-        border-radius: 16px;
-        border: 2px solid rgba(244,194,194,0.3);
-    }
-    
-    .ascendant-symbol {
-        font-size: 4rem;
-        margin-bottom: 0.5rem;
-        color: var(--dusty-rose);
-    }
-    
-    .ascendant-name {
-        font-family: 'Playfair Display', serif;
-        font-size: 2rem;
-        color: var(--warm-charcoal);
-        margin-bottom: 0.5rem;
-    }
-    
-    .rashi-info-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1rem;
-        margin-top: 1.5rem;
-    }
-    
-    .rashi-info-item {
-        text-align: center;
-        padding: 1rem;
-        background: white;
-        border-radius: 12px;
-    }
-    
-    .rashi-info-label {
-        font-size: 0.8rem;
-        color: var(--muted-mauve);
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 0.25rem;
-    }
-    
-    .rashi-info-value {
-        font-weight: 600;
-        color: var(--warm-charcoal);
-    }
-    
-    .dasha-card {
-        background: linear-gradient(135deg, rgba(244,194,194,0.1), rgba(230,230,250,0.1));
-        border-left: 4px solid var(--blush-rose);
-        border-radius: 12px;
-        padding: 1.5rem;
-    }
-    
-    .dasha-lord {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.5rem;
-        color: var(--dusty-rose);
-    }
-    
-    .dasha-period {
-        color: var(--muted-mauve);
-        font-size: 0.95rem;
-        margin-top: 0.5rem;
-    }
-    
-    .dasha-interpretation {
-        margin-top: 1rem;
-        padding-top: 1rem;
-        border-top: 1px solid rgba(244,194,194,0.3);
-    }
-    
-    .quick-link-card {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 1.25rem;
-        background: white;
-        border-radius: 12px;
-        text-decoration: none;
-        color: inherit;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
-    }
-    
-    .quick-link-card:hover {
-        border-color: var(--blush-rose);
-        transform: translateX(5px);
-        color: inherit;
-    }
-    
-    .quick-link-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.25rem;
-        background: linear-gradient(135deg, var(--lavender-mist), var(--blush-rose));
-        color: white;
-    }
-    
-    .birth-data-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
-    }
-    
-    .birth-data-item {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.75rem;
-        background: rgba(244,194,194,0.1);
-        border-radius: 10px;
-    }
-    
-    .birth-data-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: white;
-        color: var(--dusty-rose);
-    }
-    
-    .swisseph-warning {
-        background: linear-gradient(135deg, #fff3cd, #ffeaa7);
-        border: 2px solid #ffc107;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-</style>
-{% endblock %}
+{% block title %}Astro - JaytiPargal.in{% endblock %}
 
 {% block content %}
-<div class="container py-5">
+<div class="container py-4">
     <!-- Header -->
-    <div class="text-center mb-5">
-        <h1 class="display-5 mb-3">
-            <i class="fas fa-star text-blush me-3"></i>Your Cosmic Blueprint
-        </h1>
-        <p class="text-mauve lead">Discover the celestial patterns that guide your journey</p>
-    </div>
-    
-    {% if swisseph_unavailable %}
-    <!-- SwissEph Warning -->
-    <div class="swisseph-warning">
-        <div class="d-flex align-items-start">
-            <i class="fas fa-exclamation-triangle text-warning me-3" style="font-size: 1.5rem; margin-top: 0.25rem;"></i>
-            <div>
-                <h5 class="mb-2">Astrology Calculations Limited</h5>
-                <p class="mb-0">The Swiss Ephemeris library is currently unavailable. Birth chart calculations are using simplified astronomical data. For precise readings, please ensure the pyswisseph package is properly installed.</p>
-            </div>
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 style="color: var(--dusty-rose);"><i class="fas fa-star me-2"></i>Your Astrology</h2>
+            <p class="text-muted">Vedic birth chart and cosmic guidance based on your birth details.</p>
         </div>
+    </div>
+
+    {% if swisseph_unavailable %}
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Astrology features temporarily unavailable.</strong> Please try again later.
     </div>
     {% endif %}
-    
-    <!-- Astro Hero Section -->
-    <div class="astro-hero">
-        <div class="row align-items-center">
-            <div class="col-lg-4">
-                <!-- Ascendant Display -->
-                <div class="ascendant-display">
-                    <div class="ascendant-symbol">{{ rashi_info.symbol|default:"☉" }}</div>
-                    <div class="ascendant-name">{{ ascendant|title|default:"Leo" }} Ascendant</div>
-                    <p class="text-muted mb-0">Your rising sign shapes your outer personality</p>
-                    
-                    <div class="rashi-info-grid">
-                        <div class="rashi-info-item">
-                            <div class="rashi-info-label">Element</div>
-                            <div class="rashi-info-value">{{ rashi_info.element|default:"Fire" }}</div>
-                        </div>
-                        <div class="rashi-info-item">
-                            <div class="rashi-info-label">Quality</div>
-                            <div class="rashi-info-value">{{ rashi_info.quality|default:"Fixed" }}</div>
-                        </div>
-                        <div class="rashi-info-item">
-                            <div class="rashi-info-label">Lord</div>
-                            <div class="rashi-info-value">{{ rashi_info.lord|default:"Sun" }}</div>
-                        </div>
-                    </div>
+
+    <!-- Birth Info Card -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-user-circle me-2"></i>Birth Details</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><strong><i class="fas fa-birthday-cake me-2 text-primary"></i>Date:</strong> {{ birth_data.day }}-{{ birth_data.month }}-{{ birth_data.year }}</li>
+                        <li class="mb-2"><strong><i class="fas fa-clock me-2 text-primary"></i>Time:</strong> {{ birth_data.hour }}:{{ birth_data.minute|default:'00' }}</li>
+                        <li class="mb-2"><strong><i class="fas fa-map-marker-alt me-2 text-primary"></i>Place:</strong> {{ birth_data.location }}</li>
+                        <li><strong><i class="fas fa-globe me-2 text-primary"></i>Coordinates:</strong> {{ birth_data.latitude }}, {{ birth_data.longitude }}</li>
+                    </ul>
                 </div>
             </div>
-            
-            <div class="col-lg-4">
-                <!-- Birth Data Card -->
-                <div class="astro-card">
-                    <div class="astro-icon">
-                        <i class="fas fa-baby"></i>
-                    </div>
-                    <h4>JAYTI_BIRTH_DATA</h4>
-                    <div class="birth-data-grid mt-3">
-                        <div class="birth-data-item">
-                            <div class="birth-data-icon">
-                                <i class="fas fa-calendar"></i>
-                            </div>
-                            <div>
-                                <small class="text-muted d-block">Date</small>
-                                <strong>{{ birth_data.day|default:"26" }} {{ birth_data.month|default:"August" }} {{ birth_data.year|default:"1996" }}</strong>
-                            </div>
-                        </div>
-                        <div class="birth-data-item">
-                            <div class="birth-data-icon">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div>
-                                <small class="text-muted d-block">Time</small>
-                                <strong>{{ birth_data.hour|default:"08" }}:{{ birth_data.minute|default:"30" }}</strong>
-                            </div>
-                        </div>
-                        <div class="birth-data-item">
-                            <div class="birth-data-icon">
-                                <i class="fas fa-map-marker-alt"></i>
-                            </div>
-                            <div>
-                                <small class="text-muted d-block">Location</small>
-                                <strong>{{ birth_data.location|default:"Pune, India" }}</strong>
-                            </div>
-                        </div>
-                        <div class="birth-data-item">
-                            <div class="birth-data-icon">
-                                <i class="fas fa-sun"></i>
-                            </div>
-                            <div>
-                                <small class="text-muted d-block">Sun Sign</small>
-                                <strong>{{ sun_sign|default:"Virgo" }}</strong>
-                            </div>
-                        </div>
-                    </div>
+        </div>
+
+        <div class="col-lg-6 mb-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-sun me-2"></i>Ascendant</h5>
                 </div>
-            </div>
-            
-            <div class="col-lg-4">
-                <!-- Current Dasha Card -->
-                {% if current_dasha %}
-                <div class="dasha-card">
-                    <h5 class="mb-3">
-                        <i class="fas fa-moon text-blush me-2"></i>Current Dasha Period
-                    </h5>
-                    <div class="dasha-lord">{{ current_dasha.lord }} Mahadasha</div>
-                    <div class="dasha-period">
-                        <i class="fas fa-calendar-alt me-2"></i>
-                        {{ current_dasha.start_date|date:"M Y" }} — {{ current_dasha.end_date|date:"M Y" }}
-                    </div>
-                    {% if current_interpretation %}
-                    <div class="dasha-interpretation">
-                        <p class="mb-2"><strong>Theme:</strong> {{ current_interpretation.theme }}</p>
-                        <p class="mb-0 text-muted small">{{ current_interpretation.focus|truncatewords:15 }}</p>
-                    </div>
-                    {% endif %}
-                    <a href="{% url 'dasha_periods' %}" class="btn btn-outline-primary btn-sm mt-3">
-                        View Full Timeline
-                    </a>
+                <div class="card-body text-center">
+                    <h2 style="font-size: 3rem;">{{ rashi_info.symbol }}</h2>
+                    <h4 class="mb-1">{{ ascendant|title }}</h4>
+                    <p class="text-muted mb-2">{{ rashi_info.quality }} {{ rashi_info.element }}</p>
+                    <p class="small text-muted">Lord: {{ rashi_info.lord|title }}</p>
                 </div>
-                {% else %}
-                <div class="dasha-card text-center">
-                    <i class="fas fa-moon text-blush" style="font-size: 3rem;"></i>
-                    <h5 class="mt-3">Dasha Periods</h5>
-                    <p class="text-muted">Discover your planetary time cycles</p>
-                    <a href="{% url 'dasha_periods' %}" class="btn btn-outline-primary btn-sm">
-                        Explore Dasha
-                    </a>
-                </div>
-                {% endif %}
             </div>
         </div>
     </div>
-    
-    <!-- Quick Links Grid -->
-    <div class="row g-4 mb-5">
-        <div class="col-md-6 col-lg-3">
-            <a href="{% url 'birth_chart' %}" class="quick-link-card">
-                <div class="quick-link-icon">
-                    <i class="fas fa-chart-pie"></i>
-                </div>
-                <div>
-                    <h6 class="mb-1">Birth Chart</h6>
-                    <small class="text-muted">Visual Kundali</small>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-6 col-lg-3">
-            <a href="{% url 'house_details' %}" class="quick-link-card">
-                <div class="quick-link-icon">
-                    <i class="fas fa-home"></i>
-                </div>
-                <div>
-                    <h6 class="mb-1">House Details</h6>
-                    <small class="text-muted">12 Houses Analysis</small>
+
+    <!-- Navigation Cards -->
+    <div class="row mb-4">
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{% url 'birth_chart' %}" class="text-decoration-none">
+                <div class="card h-100 text-center p-3 hover-card">
+                    <div class="card-body">
+                        <i class="fas fa-chart-pie text-primary mb-3" style="font-size: 2.5rem;"></i>
+                        <h5>Birth Chart</h5>
+                        <p class="text-muted small mb-0">View your complete Kundli with planetary positions</p>
+                    </div>
                 </div>
             </a>
         </div>
-        <div class="col-md-6 col-lg-3">
-            <a href="{% url 'dasha_periods' %}" class="quick-link-card">
-                <div class="quick-link-icon">
-                    <i class="fas fa-hourglass-half"></i>
-                </div>
-                <div>
-                    <h6 class="mb-1">Dasha Periods</h6>
-                    <small class="text-muted">Planetary Cycles</small>
+
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{% url 'house_details' %}" class="text-decoration-none">
+                <div class="card h-100 text-center p-3 hover-card">
+                    <div class="card-body">
+                        <i class="fas fa-home text-success mb-3" style="font-size: 2.5rem;"></i>
+                        <h5>12 Houses</h5>
+                        <p class="text-muted small mb-0">Detailed analysis of each house in your chart</p>
+                    </div>
                 </div>
             </a>
         </div>
-        <div class="col-md-6 col-lg-3">
-            <a href="{% url 'predictions' %}" class="quick-link-card">
-                <div class="quick-link-icon">
-                    <i class="fas fa-star"></i>
+
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{% url 'dasha_periods' %}" class="text-decoration-none">
+                <div class="card h-100 text-center p-3 hover-card">
+                    <div class="card-body">
+                        <i class="fas fa-hourglass-half text-warning mb-3" style="font-size: 2.5rem;"></i>
+                        <h5>Dasha Periods</h5>
+                        <p class="text-muted small mb-0">Vimshottari Dasha timeline and predictions</p>
+                    </div>
                 </div>
-                <div>
-                    <h6 class="mb-1">Predictions</h6>
-                    <small class="text-muted">90-Day Insights</small>
+            </a>
+        </div>
+
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{% url 'predictions' %}" class="text-decoration-none">
+                <div class="card h-100 text-center p-3 hover-card">
+                    <div class="card-body">
+                        <i class="fas fa-compass text-info mb-3" style="font-size: 2.5rem;"></i>
+                        <h5>Guidance</h5>
+                        <p class="text-muted small mb-0">90-day cosmic guidance and predictions</p>
+                    </div>
                 </div>
             </a>
         </div>
     </div>
-    
-    <!-- Planet Quick View -->
-    {% if planets %}
-    <div class="card">
-        <div class="card-header bg-transparent">
-            <h5 class="mb-0">
-                <i class="fas fa-planet-ringed text-blush me-2"></i>Planetary Positions
-            </h5>
-        </div>
-        <div class="card-body">
-            <div class="row g-3">
-                {% for planet in planets|slice:":6" %}
-                <div class="col-6 col-md-4 col-lg-2">
-                    <a href="{% url 'planet_detail' planet=planet.name %}" class="text-decoration-none">
-                        <div class="text-center p-3 rounded" style="background: rgba(244,194,194,0.1);">
-                            <div style="font-size: 2rem; color: var(--dusty-rose);">{{ planet.symbol }}</div>
-                            <h6 class="mb-1">{{ planet.name|title }}</h6>
-                            <small class="text-muted">{{ planet.rashi|title }}</small>
-                        </div>
-                    </a>
+
+    <!-- Current Dasha -->
+    {% if current_dasha %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Current Mahadasha</h5>
                 </div>
-                {% endfor %}
-            </div>
-            <div class="text-center mt-4">
-                <a href="{% url 'birth_chart' %}" class="btn btn-outline-primary">
-                    View All Planets
-                </a>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4 style="color: var(--dusty-rose);">{{ current_dasha.lord }} Mahadasha</h4>
+                            <p class="text-muted">
+                                <i class="far fa-calendar-alt me-2"></i>
+                                {{ current_dasha.start_date|date:"M d, Y" }} - {{ current_dasha.end_date|date:"M d, Y" }}
+                            </p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <a href="{% url 'dasha_periods' %}" class="btn btn-primary">
+                                <i class="fas fa-eye me-2"></i>View Full Timeline
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     {% endif %}
 </div>
+
+<style>
+.hover-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+</style>
 {% endblock %}
