@@ -1,404 +1,70 @@
 {% extends 'base.html' %}
 
-{% block title %}House Details - jayti{% endblock %}
-
-{% block extra_css %}
-<style>
-    .house-hero {
-        text-align: center;
-        margin-bottom: 2.5rem;
-    }
-    
-    .houses-table-container {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-        overflow: hidden;
-    }
-    
-    .houses-table {
-        width: 100%;
-        margin-bottom: 0;
-    }
-    
-    .houses-table thead th {
-        background: linear-gradient(135deg, var(--blush-rose), var(--dusty-rose));
-        color: white;
-        font-weight: 600;
-        padding: 1.25rem 1rem;
-        border: none;
-        font-family: 'Playfair Display', serif;
-    }
-    
-    .houses-table tbody tr {
-        transition: all 0.3s ease;
-    }
-    
-    .houses-table tbody tr:hover {
-        background: rgba(244,194,194,0.1);
-    }
-    
-    .houses-table tbody td {
-        padding: 1.25rem 1rem;
-        border-bottom: 1px solid rgba(244,194,194,0.2);
-        vertical-align: middle;
-    }
-    
-    .house-number-cell {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--dusty-rose);
-        width: 80px;
-        text-align: center;
-    }
-    
-    .house-meaning {
-        font-weight: 500;
-        color: var(--warm-charcoal);
-    }
-    
-    .house-meaning-sub {
-        font-size: 0.85rem;
-        color: var(--muted-mauve);
-    }
-    
-    .rashi-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        background: rgba(230,230,250,0.4);
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-weight: 500;
-    }
-    
-    .rashi-symbol {
-        font-size: 1.25rem;
-    }
-    
-    .lord-badge {
-        display: inline-block;
-        background: rgba(244,194,194,0.2);
-        padding: 0.4rem 0.875rem;
-        border-radius: 15px;
-        font-size: 0.9rem;
-        color: var(--warm-charcoal);
-    }
-    
-    .planets-in-house {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-    }
-    
-    .planet-tag {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-        background: white;
-        border: 1px solid rgba(244,194,194,0.4);
-        padding: 0.35rem 0.75rem;
-        border-radius: 15px;
-        font-size: 0.85rem;
-        transition: all 0.2s ease;
-        text-decoration: none;
-        color: inherit;
-    }
-    
-    .planet-tag:hover {
-        background: var(--blush-rose);
-        color: white;
-        border-color: var(--blush-rose);
-    }
-    
-    .planet-symbol-small {
-        font-size: 1rem;
-    }
-    
-    .planet-degree {
-        font-size: 0.75rem;
-        opacity: 0.8;
-    }
-    
-    .strength-score {
-        text-align: center;
-    }
-    
-    .strength-value {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 45px;
-        height: 45px;
-        border-radius: 50%;
-        font-weight: 600;
-        font-size: 0.95rem;
-    }
-    
-    .strength-strong {
-        background: linear-gradient(135deg, #28a745, #20c997);
-        color: white;
-    }
-    
-    .strength-moderate {
-        background: linear-gradient(135deg, #ffc107, #ff9800);
-        color: white;
-    }
-    
-    .strength-gentle {
-        background: linear-gradient(135deg, #6c757d, #adb5bd);
-        color: white;
-    }
-    
-    .strength-label {
-        font-size: 0.75rem;
-        color: var(--muted-mauve);
-        margin-top: 0.25rem;
-    }
-    
-    .empty-house {
-        color: var(--muted-mauve);
-        font-style: italic;
-        font-size: 0.9rem;
-    }
-    
-    .house-legend {
-        display: flex;
-        justify-content: center;
-        gap: 2rem;
-        margin-top: 2rem;
-        padding: 1.5rem;
-        background: rgba(244,194,194,0.1);
-        border-radius: 12px;
-    }
-    
-    .legend-item {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-    
-    .legend-dot {
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-    }
-    
-    .legend-strong { background: linear-gradient(135deg, #28a745, #20c997); }
-    .legend-moderate { background: linear-gradient(135deg, #ffc107, #ff9800); }
-    .legend-gentle { background: linear-gradient(135deg, #6c757d, #adb5bd); }
-    
-    @media (max-width: 991px) {
-        .houses-table-container {
-            overflow-x: auto;
-        }
-        
-        .houses-table {
-            min-width: 900px;
-        }
-    }
-</style>
-{% endblock %}
+{% block title %}12 Houses - JaytiPargal.in{% endblock %}
 
 {% block content %}
-<div class="container py-5">
+<div class="container py-4">
     <!-- Header -->
-    <div class="house-hero">
-        <h1 class="display-5 mb-3">
-            <i class="fas fa-home text-blush me-3"></i>The Twelve Houses
-        </h1>
-        <p class="text-mauve lead">Explore the domains of your life through the astrological houses</p>
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 style="color: var(--dusty-rose);"><i class="fas fa-home me-2"></i>12 Houses Analysis</h2>
+            <p class="text-muted">Detailed breakdown of each house in your birth chart.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{% url 'astro_dashboard' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Astro
+            </a>
+        </div>
     </div>
-    
-    <!-- Houses Table -->
-    <div class="houses-table-container">
-        <table class="houses-table">
-            <thead>
-                <tr>
-                    <th>House</th>
-                    <th>Domain</th>
-                    <th>Rashi</th>
-                    <th>Lord</th>
-                    <th>Planets</th>
-                    <th>Strength</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for house in houses %}
-                <tr>
-                    <td class="house-number-cell">
-                        {{ house.number }}
-                    </td>
-                    <td>
-                        <div class="house-meaning">{{ house.meaning }}</div>
-                        <div class="house-meaning-sub">{{ house.sub_meaning|default:"Life Area" }}</div>
-                    </td>
-                    <td>
-                        <div class="rashi-badge">
-                            <span class="rashi-symbol">{{ house.rashi_info.symbol|default:"☉" }}</span>
-                            <span>{{ house.rashi|title }}</span>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="lord-badge">
-                            <i class="fas fa-crown me-1" style="font-size: 0.75rem;"></i>
-                            {{ house.lord|title }}
-                        </span>
-                    </td>
-                    <td>
-                        {% if house.planets %}
-                        <div class="planets-in-house">
+
+    <!-- Houses Grid -->
+    <div class="row">
+        {% for house in houses %}
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card h-100 shadow-sm {% if house.score >= 25 %}border-success{% elif house.score >= 18 %}border-primary{% endif %}">
+                <div class="card-header bg-white py-2 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">House {{ house.number }}</h5>
+                    <span class="badge {% if house.score >= 25 %}bg-success{% elif house.score >= 18 %}bg-primary{% else %}bg-secondary{% endif %}">
+                        Score: {{ house.score }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-2">{{ house.meaning }}</p>
+                    
+                    <div class="mb-2">
+                        <small class="text-muted">Rashi:</small>
+                        <span class="badge bg-light text-dark">{{ house.rashi_info.symbol }} {{ house.rashi|title }}</span>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <small class="text-muted">Lord:</small>
+                        <span class="badge bg-light text-dark">{{ house.lord_info.symbol }} {{ house.lord|title }}</span>
+                    </div>
+
+                    {% if house.planets %}
+                    <div class="mt-3">
+                        <small class="text-muted">Planets:</small>
+                        <div class="mt-1">
                             {% for planet in house.planets %}
-                            <a href="{% url 'planet_detail' planet=planet.name %}" class="planet-tag">
-                                <span class="planet-symbol-small">{{ planet.symbol }}</span>
-                                <span>{{ planet.name|title }}</span>
-                                <span class="planet-degree">{{ planet.degree|floatformat:1 }}°</span>
+                            <a href="{% url 'planet_detail' planet.name %}" class="badge bg-info text-decoration-none me-1">
+                                {{ planet.symbol }} {{ planet.name|title }}
                             </a>
                             {% endfor %}
                         </div>
-                        {% else %}
-                        <span class="empty-house">
-                            <i class="fas fa-circle text-muted me-1" style="font-size: 0.5rem;"></i>
-                            Empty
-                        </span>
-                        {% endif %}
-                    </td>
-                    <td class="strength-score">
-                        {% with score=house.score|default:20 %}
-                        <div class="strength-value {% if score >= 25 %}strength-strong{% elif score >= 18 %}strength-moderate{% else %}strength-gentle{% endif %}">
-                            {{ score }}
-                        </div>
-                        <div class="strength-label">
-                            {% if score >= 25 %}Strong{% elif score >= 18 %}Moderate{% else %}Gentle{% endif %}
-                        </div>
-                        {% endwith %}
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="6" class="text-center py-5">
-                        <i class="fas fa-info-circle text-muted mb-3" style="font-size: 2rem;"></i>
-                        <p class="text-muted mb-0">House data is being calculated. Please check back shortly.</p>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    
-    <!-- Legend -->
-    <div class="house-legend">
-        <div class="legend-item">
-            <div class="legend-dot legend-strong"></div>
-            <span><strong>Strong (25-36)</strong> Excellent planetary support</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-dot legend-moderate"></div>
-            <span><strong>Moderate (18-24)</strong> Balanced energy</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-dot legend-gentle"></div>
-            <span><strong>Gentle (0-17)</strong> Requires attention</span>
-        </div>
-    </div>
-    
-    <!-- House Meanings Reference -->
-    <div class="card mt-5">
-        <div class="card-header bg-transparent">
-            <h5 class="mb-0">
-                <i class="fas fa-book-open text-blush me-2"></i>House Meanings Reference
-            </h5>
-        </div>
-        <div class="card-body">
-            <div class="row g-4">
-                <div class="col-md-6 col-lg-4">
-                    <div class="p-3 rounded" style="background: rgba(244,194,194,0.1);">
-                        <h6 class="text-blush mb-2">1st House - Self</h6>
-                        <p class="small text-muted mb-0">Physical body, personality, appearance, and approach to life</p>
                     </div>
+                    {% else %}
+                    <div class="mt-3">
+                        <small class="text-muted">Planets:</small>
+                        <span class="text-muted small fst-italic">Empty</span>
+                    </div>
+                    {% endif %}
                 </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="p-3 rounded" style="background: rgba(230,230,250,0.4);">
-                        <h6 class="text-blush mb-2">2nd House - Wealth</h6>
-                        <p class="small text-muted mb-0">Finances, possessions, family lineage, and speech</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="p-3 rounded" style="background: rgba(244,194,194,0.1);">
-                        <h6 class="text-blush mb-2">3rd House - Communication</h6>
-                        <p class="small text-muted mb-0">Siblings, courage, short travels, and communication skills</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="p-3 rounded" style="background: rgba(230,230,250,0.4);">
-                        <h6 class="text-blush mb-2">4th House - Home</h6>
-                        <p class="small text-muted mb-0">Mother, home environment, vehicles, and emotional foundations</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="p-3 rounded" style="background: rgba(244,194,194,0.1);">
-                        <h6 class="text-blush mb-2">5th House - Creativity</h6>
-                        <p class="small text-muted mb-0">Children, intelligence, romance, and creative expression</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="p-3 rounded" style="background: rgba(230,230,250,0.4);">
-                        <h6 class="text-blush mb-2">6th House - Service</h6>
-                        <p class="small text-muted mb-0">Health, enemies, debts, daily work, and service</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="p-3 rounded" style="background: rgba(244,194,194,0.1);">
-                        <h6 class="text-blush mb-2">7th House - Partnership</h6>
-                        <p class="small text-muted mb-0">Marriage, business partnerships, and significant others</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="p-3 rounded" style="background: rgba(230,230,250,0.4);">
-                        <h6 class="text-blush mb-2">8th House - Transformation</h6>
-                        <p class="small text-muted mb-0">Mysteries, longevity, inheritance, and spiritual growth</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="p-3 rounded" style="background: rgba(244,194,194,0.1);">
-                        <h6 class="text-blush mb-2">9th House - Fortune</h6>
-                        <p class="small text-muted mb-0">Higher learning, spirituality, father, and luck</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="p-3 rounded" style="background: rgba(230,230,250,0.4);">
-                        <h6 class="text-blush mb-2">10th House - Career</h6>
-                        <p class="small text-muted mb-0">Profession, status, reputation, and public image</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="p-3 rounded" style="background: rgba(244,194,194,0.1);">
-                        <h6 class="text-blush mb-2">11th House - Gains</h6>
-                        <p class="small text-muted mb-0">Friends, social networks, income, and aspirations</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="p-3 rounded" style="background: rgba(230,230,250,0.4);">
-                        <h6 class="text-blush mb-2">12th House - Liberation</h6>
-                        <p class="small text-muted mb-0">Spiritual liberation, losses, foreign lands, and meditation</p>
-                    </div>
+                <div class="card-footer bg-white py-2">
+                    <small class="text-muted">Strength: <strong>{{ house.strength }}</strong></small>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Navigation -->
-    <div class="text-center mt-5">
-        <a href="{% url 'astro_dashboard' %}" class="btn btn-outline-secondary me-2">
-            <i class="fas fa-arrow-left me-2"></i>Back to Astro
-        </a>
-        <a href="{% url 'birth_chart' %}" class="btn btn-outline-primary me-2">
-            <i class="fas fa-chart-pie me-2"></i>Birth Chart
-        </a>
-        <a href="{% url 'predictions' %}" class="btn btn-primary">
-            <i class="fas fa-star me-2"></i>View Predictions
-        </a>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}

@@ -45,33 +45,30 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% load diary_tags %}
-                            {% for week in weeks %}
+                            {% for week in calendar_weeks %}
                             <tr style="height: 80px;">
-                                {% for day in week %}
-                                <td class="text-center align-middle {% if day == today %}table-primary{% endif %}">
-                                    {% if day %}
-                                        {% with entry=entry_dates|get_item:day %}
-                                        {% if entry %}
-                                        <a href="{% url 'diary_entry_detail' entry.pk %}" class="text-decoration-none">
+                                {% for day_cell in week %}
+                                <td class="text-center align-middle {% if day_cell.date == today %}table-primary{% endif %}">
+                                    {% if day_cell.date %}
+                                        {% if day_cell.entry %}
+                                        <a href="{% url 'diary_entry_detail' day_cell.entry.pk %}" class="text-decoration-none">
                                             <div class="d-flex flex-column align-items-center">
-                                                <span class="fw-bold" style="color: var(--dusty-rose);">{{ day.day }}</span>
+                                                <span class="fw-bold" style="color: var(--dusty-rose);">{{ day_cell.date.day }}</span>
                                                 <i class="fas fa-book-open text-primary mt-1" style="font-size: 0.8rem;"></i>
                                             </div>
                                         </a>
                                         {% else %}
-                                            {% if day == today %}
+                                            {% if day_cell.date == today %}
                                             <a href="{% url 'diary_write' %}" class="text-decoration-none">
                                                 <div class="d-flex flex-column align-items-center">
-                                                    <span class="fw-bold">{{ day.day }}</span>
+                                                    <span class="fw-bold">{{ day_cell.date.day }}</span>
                                                     <span class="badge bg-primary mt-1" style="font-size: 0.6rem;">Write</span>
                                                 </div>
                                             </a>
                                             {% else %}
-                                            <span class="text-muted">{{ day.day }}</span>
+                                            <span class="{% if day_cell.in_month %}text-dark{% else %}text-muted{% endif %}">{{ day_cell.date.day }}</span>
                                             {% endif %}
                                         {% endif %}
-                                        {% endwith %}
                                     {% endif %}
                                 </td>
                                 {% endfor %}
