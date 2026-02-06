@@ -1,0 +1,48 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "NIXPACKS",
+    "buildCommand": "pip install -r requirements.txt && python manage.py collectstatic --noinput"
+  },
+  "deploy": {
+    "startCommand": "bash railway_startup.sh",
+    "healthcheckPath": "/health/",
+    "healthcheckTimeout": 300,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 5
+  },
+  "variables": {
+    "SECRET_KEY": {
+      "description": "Django secret key (generate at https://djecrety.ir/)",
+      "required": true
+    },
+    "DEBUG": {
+      "description": "Debug mode",
+      "default": "False"
+    },
+    "GEMINI_API_KEY": {
+      "description": "Google Gemini API key (get from https://makersuite.google.com/app/apikey)",
+      "required": false
+    },
+    "GEMINI_MODEL": {
+      "description": "Gemini model to use",
+      "default": "gemini-pro"
+    },
+    "ALLOWED_HOSTS": {
+      "description": "Comma-separated list of allowed hosts",
+      "default": ".up.railway.app,jaytibirthday.in,www.jaytibirthday.in"
+    },
+    "TIME_ZONE": {
+      "description": "Timezone",
+      "default": "Asia/Kolkata"
+    },
+    "BIRTH_DATE_DAY": {
+      "description": "Birthday day",
+      "default": "6"
+    },
+    "BIRTH_DATE_MONTH": {
+      "description": "Birthday month",
+      "default": "2"
+    }
+  }
+}
