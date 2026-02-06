@@ -115,19 +115,14 @@ def get_database_config():
     
     if database_url:
         # Production: Use PostgreSQL with Railway
-        # Parse the URL - Railway's internal connections don't need SSL
+        # Parse the URL - Railway handles SSL internally
         config = dj_database_url.parse(
             database_url,
             conn_max_age=600,
         )
         
-        # Only add SSL for external connections (not Railway internal)
-        # Railway's internal networking handles SSL automatically
-        if os.environ.get('RAILWAY_ENVIRONMENT') != 'production':
-            # For external connections, use sslmode
-            if 'OPTIONS' not in config:
-                config['OPTIONS'] = {}
-            config['OPTIONS']['sslmode'] = 'require'
+        # Railway's internal connections don't need explicit SSL config
+        # The DATABASE_URL from Railway already includes necessary settings
         
         return config
     else:
