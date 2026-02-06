@@ -1,0 +1,477 @@
+{% extends 'base.html' %}
+
+{% block title %}Write Diary - {{ entry.entry_date|date:"F d, Y" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .diary-editor {
+        min-height: 400px;
+        background: white;
+        border: 2px solid rgba(244,194,194,0.3);
+        border-radius: 16px;
+        padding: 2rem;
+        font-family: 'Lato', sans-serif;
+        line-height: 1.8;
+        resize: vertical;
+    }
+    
+    .diary-editor:focus {
+        outline: none;
+        border-color: var(--blush-rose);
+        box-shadow: 0 0 0 0.2rem rgba(244,194,194,0.25);
+    }
+    
+    .input-method-btn {
+        border: 2px solid rgba(244,194,194,0.3);
+        background: white;
+        color: var(--muted-mauve);
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        transition: all 0.3s ease;
+        margin: 0 0.25rem;
+    }
+    
+    .input-method-btn:hover,
+    .input-method-btn.active {
+        background: linear-gradient(135deg, var(--blush-rose), var(--dusty-rose));
+        color: white;
+        border-color: transparent;
+    }
+    
+    .voice-btn {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(238,90,90,0.3);
+    }
+    
+    .voice-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(238,90,90,0.4);
+    }
+    
+    .voice-btn.recording {
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .mood-selector {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .mood-option {
+        cursor: pointer;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        font-size: 1.5rem;
+    }
+    
+    .mood-option:hover,
+    .mood-option.selected {
+        border-color: var(--blush-rose);
+        background: rgba(244,194,194,0.1);
+        transform: scale(1.1);
+    }
+    
+    .handwriting-canvas {
+        border: 2px dashed rgba(244,194,194,0.5);
+        border-radius: 16px;
+        background: white;
+        cursor: crosshair;
+    }
+    
+    .prompt-card {
+        background: linear-gradient(135deg, rgba(244,194,194,0.1), rgba(230,230,250,0.1));
+        border-left: 4px solid var(--blush-rose);
+        padding: 1rem 1.5rem;
+        border-radius: 0 12px 12px 0;
+        margin-bottom: 1.5rem;
+    }
+    
+    .voice-transcript {
+        background: rgba(244,194,194,0.1);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-top: 1rem;
+        font-style: italic;
+        color: var(--muted-mauve);
+    }
+    
+    .recording-indicator {
+        display: none;
+        align-items: center;
+        gap: 0.5rem;
+        color: #ee5a5a;
+        font-weight: 500;
+        margin-top: 1rem;
+    }
+    
+    .recording-indicator.active {
+        display: flex;
+    }
+    
+    .recording-dot {
+        width: 12px;
+        height: 12px;
+        background: #ee5a5a;
+        border-radius: 50%;
+        animation: blink 1s infinite;
+    }
+    
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h1 class="display-6 mb-2">{{ entry.entry_date|date:"F d, Y" }}</h1>
+                <p class="text-mauve">
+                    <i class="fas fa-lock me-2"></i>Private & Secure — Only you can read this
+                </p>
+            </div>
+            
+            <!-- Daily Prompt -->
+            {% if daily_prompt %}
+            <div class="prompt-card">
+                <small class="text-mauve d-block mb-1">
+                    <i class="fas fa-lightbulb me-1 text-blush"></i>Today's Reflection Prompt
+                </small>
+                <p class="mb-0 font-script" style="font-size: 1.2rem;">{{ daily_prompt.question }}</p>
+            </div>
+            {% endif %}
+            
+            <!-- Input Method Selector -->
+            <div class="text-center mb-4">
+                <button type="button" class="input-method-btn active" onclick="setInputMethod('type')">
+                    <i class="fas fa-keyboard me-2"></i>Type
+                </button>
+                <button type="button" class="input-method-btn" onclick="setInputMethod('voice')">
+                    <i class="fas fa-microphone me-2"></i>Speak
+                </button>
+                <button type="button" class="input-method-btn" onclick="setInputMethod('stylus')">
+                    <i class="fas fa-pen me-2"></i>Write
+                </button>
+            </div>
+            
+            <form method="post" id="diaryForm">
+                {% csrf_token %}
+                <input type="hidden" name="input_method" id="inputMethod" value="type">
+                <input type="hidden" name="mood" id="selectedMood" value="">
+                {% if daily_prompt %}
+                <input type="hidden" name="prompt_used" value="{{ daily_prompt.question }}">
+                {% endif %}
+                
+                <!-- Typing Input -->
+                <div id="typeInput" class="input-section">
+                    <textarea 
+                        name="content" 
+                        class="diary-editor w-100" 
+                        placeholder="Dear Diary...&#10;&#10;How are you feeling today? What's on your mind? Take this time to be honest with yourself."
+                    >{{ entry.content }}</textarea>
+                </div>
+                
+                <!-- Voice Input -->
+                <div id="voiceInput" class="input-section" style="display: none;">
+                    <div class="text-center py-5">
+                        <p class="text-mauve mb-4">Click the microphone and speak your thoughts...</p>
+                        <button type="button" class="voice-btn" id="voiceBtn" onclick="toggleVoiceRecording()">
+                            <i class="fas fa-microphone me-2"></i>
+                            <span id="voiceBtnText">Start Speaking</span>
+                        </button>
+                        
+                        <div class="recording-indicator" id="recordingIndicator">
+                            <span class="recording-dot"></span>
+                            <span>Recording... Click button to stop</span>
+                        </div>
+                        
+                        <div class="voice-transcript" id="voiceTranscript" style="display: none;">
+                            <strong>Transcript:</strong>
+                            <p class="mb-0 mt-2" id="transcriptText"></p>
+                        </div>
+                        
+                        <input type="hidden" name="voice_transcript" id="voiceTranscriptInput" value="">
+                        <input type="hidden" name="voice_duration" id="voiceDuration" value="0">
+                    </div>
+                </div>
+                
+                <!-- Handwriting Input -->
+                <div id="stylusInput" class="input-section" style="display: none;">
+                    <div class="text-center mb-3">
+                        <p class="text-mauve">Use your stylus or finger to write</p>
+                        <div class="btn-group mb-2">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearCanvas()">
+                                <i class="fas fa-eraser me-1"></i>Clear
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="undoStroke()">
+                                <i class="fas fa-undo me-1"></i>Undo
+                            </button>
+                        </div>
+                    </div>
+                    <canvas id="handwritingCanvas" class="handwriting-canvas w-100" height="400"></canvas>
+                    <input type="hidden" name="handwriting_strokes" id="handwritingStrokes" value="[]">
+                    <input type="hidden" name="handwriting_ocr_text" id="handwritingOcrText" value="">
+                    <p class="text-muted small text-center mt-2">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Your handwriting will be saved as an image. OCR text extraction coming soon.
+                    </p>
+                </div>
+                
+                <!-- Mood Tracking -->
+                <div class="mt-4 mb-4">
+                    <label class="d-block text-center mb-3">
+                        <i class="fas fa-heart text-blush me-2"></i>How are you feeling today?
+                    </label>
+                    <div class="mood-selector">
+                        <span class="mood-option" data-mood="1" title="Struggling" onclick="selectMood(1)">😔</span>
+                        <span class="mood-option" data-mood="2" title="Difficult" onclick="selectMood(2)">😕</span>
+                        <span class="mood-option" data-mood="3" title="Neutral" onclick="selectMood(3)">😐</span>
+                        <span class="mood-option" data-mood="4" title="Good" onclick="selectMood(4)">🙂</span>
+                        <span class="mood-option" data-mood="5" title="Great" onclick="selectMood(5)">😊</span>
+                    </div>
+                    <input type="text" name="mood_note" class="form-control mt-3" placeholder="Add a note about your mood (optional)" value="{{ entry.mood_note }}">
+                </div>
+                
+                <!-- Submit Buttons -->
+                <div class="d-flex gap-3 justify-content-center mt-4">
+                    <a href="{% url 'diary_overview' %}" class="btn btn-outline-secondary btn-lg px-4">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                        <i class="fas fa-save me-2"></i>Save Entry
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Input Method Switching
+    function setInputMethod(method) {
+        document.querySelectorAll('.input-method-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.closest('.input-method-btn').classList.add('active');
+        
+        document.getElementById('inputMethod').value = method;
+        
+        document.querySelectorAll('.input-section').forEach(section => section.style.display = 'none');
+        document.getElementById(method + 'Input').style.display = 'block';
+    }
+    
+    // Mood Selection
+    function selectMood(mood) {
+        document.getElementById('selectedMood').value = mood;
+        document.querySelectorAll('.mood-option').forEach(option => option.classList.remove('selected'));
+        document.querySelector(`[data-mood="${mood}"]`).classList.add('selected');
+    }
+    
+    // Voice Recording
+    let recognition = null;
+    let recordingStartTime = null;
+    let isRecording = false;
+    
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-IN';
+        
+        recognition.onresult = function(event) {
+            let finalTranscript = '';
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                if (event.results[i].isFinal) {
+                    finalTranscript += event.results[i][0].transcript;
+                }
+            }
+            
+            if (finalTranscript) {
+                document.getElementById('transcriptText').textContent = finalTranscript;
+                document.getElementById('voiceTranscriptInput').value = finalTranscript;
+                document.getElementById('voiceTranscript').style.display = 'block';
+            }
+        };
+        
+        recognition.onerror = function(event) {
+            console.error('Speech recognition error:', event.error);
+            stopRecording();
+            alert('Voice recording error: ' + event.error + '. Please try again or use typing.');
+        };
+    }
+    
+    function toggleVoiceRecording() {
+        if (!recognition) {
+            alert('Voice recording is not supported in your browser. Please use Chrome or Edge.');
+            return;
+        }
+        
+        if (isRecording) {
+            stopRecording();
+        } else {
+            startRecording();
+        }
+    }
+    
+    function startRecording() {
+        isRecording = true;
+        recordingStartTime = Date.now();
+        
+        document.getElementById('voiceBtn').classList.add('recording');
+        document.getElementById('voiceBtnText').textContent = 'Stop Recording';
+        document.getElementById('recordingIndicator').classList.add('active');
+        
+        recognition.start();
+    }
+    
+    function stopRecording() {
+        isRecording = false;
+        
+        const duration = Math.round((Date.now() - recordingStartTime) / 1000);
+        document.getElementById('voiceDuration').value = duration;
+        
+        document.getElementById('voiceBtn').classList.remove('recording');
+        document.getElementById('voiceBtnText').textContent = 'Start Speaking';
+        document.getElementById('recordingIndicator').classList.remove('active');
+        
+        if (recognition) {
+            recognition.stop();
+        }
+    }
+    
+    // Handwriting Canvas
+    let canvas, ctx;
+    let isDrawing = false;
+    let strokes = [];
+    let currentStroke = [];
+    
+    function initCanvas() {
+        canvas = document.getElementById('handwritingCanvas');
+        if (!canvas) return;
+        
+        ctx = canvas.getContext('2d');
+        ctx.strokeStyle = '#4A4A4A';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        
+        // Mouse events
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+        
+        // Touch events
+        canvas.addEventListener('touchstart', handleTouch);
+        canvas.addEventListener('touchmove', handleTouch);
+        canvas.addEventListener('touchend', stopDrawing);
+    }
+    
+    function startDrawing(e) {
+        isDrawing = true;
+        currentStroke = [];
+        const pos = getPos(e);
+        currentStroke.push(pos);
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+    }
+    
+    function draw(e) {
+        if (!isDrawing) return;
+        const pos = getPos(e);
+        currentStroke.push(pos);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+    }
+    
+    function stopDrawing() {
+        if (!isDrawing) return;
+        isDrawing = false;
+        if (currentStroke.length > 0) {
+            strokes.push([...currentStroke]);
+            updateStrokesInput();
+        }
+    }
+    
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        
+        return {
+            x: (e.clientX - rect.left) * scaleX,
+            y: (e.clientY - rect.top) * scaleY
+        };
+    }
+    
+    function handleTouch(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 'mousemove', {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        });
+        canvas.dispatchEvent(mouseEvent);
+    }
+    
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        strokes = [];
+        updateStrokesInput();
+    }
+    
+    function undoStroke() {
+        if (strokes.length === 0) return;
+        strokes.pop();
+        redrawCanvas();
+        updateStrokesInput();
+    }
+    
+    function redrawCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        strokes.forEach(stroke => {
+            if (stroke.length === 0) return;
+            ctx.beginPath();
+            ctx.moveTo(stroke[0].x, stroke[0].y);
+            for (let i = 1; i < stroke.length; i++) {
+                ctx.lineTo(stroke[i].x, stroke[i].y);
+            }
+            ctx.stroke();
+        });
+    }
+    
+    function updateStrokesInput() {
+        document.getElementById('handwritingStrokes').value = JSON.stringify(strokes);
+    }
+    
+    // Initialize canvas when stylus tab is selected
+    document.querySelector('[onclick="setInputMethod(\'stylus\')"]').addEventListener('click', function() {
+        setTimeout(initCanvas, 100);
+    });
+    
+    // Set initial mood if exists
+    {% if entry.mood %}
+    selectMood({{ entry.mood }});
+    {% endif %}
+</script>
+{% endblock %}

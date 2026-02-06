@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - JaytiPargal.in{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Vivek's Emotional Greeting (First login of the day) -->
+    {% if show_vivek_message %}
+    <div class="row mb-5 animate-fade-in" id="vivekGreeting">
+        <div class="col-lg-10 mx-auto">
+            <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, rgba(244,194,194,0.15), rgba(230,230,250,0.15));">
+                <div class="card-body p-5 position-relative">
+                    <button type="button" class="btn-close position-absolute top-0 end-0 m-3" onclick="dismissVivekGreeting()" aria-label="Close"></button>
+                    <div class="text-center">
+                        <i class="fas fa-heart text-blush mb-3" style="font-size: 2.5rem;"></i>
+                        <h2 class="font-script mb-4" style="font-size: 2rem; color: var(--dusty-rose);">My Prayer for You</h2>
+                        <div class="text-start mx-auto" style="max-width: 600px; line-height: 2;">
+                            <p class="lead">Dear {{ display_name|default:"Jayti" }},</p>
+                            <p>
+                                As you begin this day, I want you to remember: you are capable of extraordinary things. 
+                                The strength you carry, even when you feel weary, is a testament to your resilience.
+                            </p>
+                            <p>
+                                May today bring you moments of clarity, peace, and small victories. 
+                                When challenges arise, know that you have the tools here to navigate them—
+                                your Goals for direction, your Diary for reflection, your Notes for clarity, 
+                                and your Astro for cosmic guidance.
+                            </p>
+                            <p>
+                                Whatever today holds, meet it with the knowledge that you are worthy of 
+                                happiness, success, and love—not because you've earned it through struggle, 
+                                but simply because you exist.
+                            </p>
+                            <p class="font-script mt-4" style="font-size: 1.5rem; color: var(--dusty-rose);">
+                                With hope for your flourishing,<br>
+                                Vivek
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Welcome Section -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto text-center animate-fade-in">
+            <h1 class="display-5 mb-3">Welcome, {{ display_name|default:"Jayti" }}</h1>
+            <p class="lead text-mauve">
+                This is your personal sanctuary—five pillars to support your journey of growth and healing.
+            </p>
+            {% if time_greeting %}
+            <p class="text-muted">
+                <i class="fas fa-sun me-2 text-blush"></i>{{ time_greeting.message }}
+            </p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Five Pillars -->
+    <div class="row g-4">
+        <!-- Karma - Goals -->
+        <div class="col-md-4">
+            <a href="{% url 'goal_list' %}" class="text-decoration-none">
+                <div class="card h-100 text-center p-4">
+                    <div class="pillar-icon pillar-karma mx-auto">
+                        <i class="fas fa-bullseye text-white"></i>
+                    </div>
+                    <h4 class="mb-2">Karma</h4>
+                    <p class="text-mauve mb-3">Action & Duty</p>
+                    <p class="text-muted small">Transform intention into structured execution</p>
+                    <div class="mt-auto">
+                        <span class="badge bg-primary">{{ active_goals }} Active Goals</span>
+                        <span class="badge bg-secondary">{{ pending_tasks }} Pending Tasks</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- Dharma - Astro -->
+        <div class="col-md-4">
+            <a href="{% url 'astro_dashboard' %}" class="text-decoration-none">
+                <div class="card h-100 text-center p-4">
+                    <div class="pillar-icon pillar-dharma mx-auto">
+                        <i class="fas fa-star text-white"></i>
+                    </div>
+                    <h4 class="mb-2">Dharma</h4>
+                    <p class="text-mauve mb-3">Righteous Path</p>
+                    <p class="text-muted small">Cosmic guidance for decision timing</p>
+                    <div class="mt-auto">
+                        <span class="badge bg-info">Vedic Birth Chart</span>
+                        <span class="badge bg-secondary">90-Day Guidance</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- Doubt - AI -->
+        <div class="col-md-4">
+            <a href="{% url 'ai_chat' %}" class="text-decoration-none">
+                <div class="card h-100 text-center p-4">
+                    <div class="pillar-icon pillar-doubt mx-auto">
+                        <i class="fas fa-robot text-white"></i>
+                    </div>
+                    <h4 class="mb-2">Doubt</h4>
+                    <p class="text-mauve mb-3">Inquiry & Question</p>
+                    <p class="text-muted small">Resolve uncertainty through dialogue</p>
+                    <div class="mt-auto">
+                        <span class="badge bg-success">Ask Jayti</span>
+                        <span class="badge bg-secondary">Private & Secure</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- Memory - Notes -->
+        <div class="col-md-6">
+            <a href="{% url 'note_list' %}" class="text-decoration-none">
+                <div class="card h-100 text-center p-4">
+                    <div class="pillar-icon pillar-memory mx-auto">
+                        <i class="fas fa-sticky-note text-white"></i>
+                    </div>
+                    <h4 class="mb-2">Memory</h4>
+                    <p class="text-mauve mb-3">Retention</p>
+                    <p class="text-muted small">Externalize cognitive load for mental clarity</p>
+                    <div class="mt-auto">
+                        <span class="badge bg-warning text-dark">{{ recent_notes }} Notes</span>
+                        <span class="badge bg-secondary">Tag-based Organization</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- Thoughts - Diary -->
+        <div class="col-md-6">
+            <a href="{% url 'diary_overview' %}" class="text-decoration-none">
+                <div class="card h-100 text-center p-4">
+                    <div class="pillar-icon pillar-thoughts mx-auto">
+                        <i class="fas fa-book text-white"></i>
+                    </div>
+                    <h4 class="mb-2">Thoughts</h4>
+                    <p class="text-mauve mb-3">Reflection</p>
+                    <p class="text-muted small">Process emotional experience through narrative</p>
+                    <div class="mt-auto">
+                        <span class="badge bg-danger">{{ recent_diary }} Entries</span>
+                        <span class="badge bg-secondary">Multi-modal Input</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Daily Inspiration -->
+    <div class="row mt-5">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, rgba(244,194,194,0.1), rgba(230,230,250,0.1));">
+                <div class="card-body text-center p-5">
+                    <i class="fas fa-quote-left text-blush mb-3" style="font-size: 2rem;"></i>
+                    <blockquote class="blockquote">
+                        {% if daily_thought %}
+                        <p class="font-script" style="font-size: 1.5rem; color: var(--warm-charcoal);">
+                            "{{ daily_thought.content }}"
+                        </p>
+                        <footer class="blockquote-footer mt-3">
+                            {{ daily_thought.author|default:"Unknown" }}
+                        </footer>
+                        {% else %}
+                        <p class="font-script" style="font-size: 1.5rem; color: var(--warm-charcoal);">
+                            "The lotus blooms most beautifully from the deepest and thickest mud."
+                        </p>
+                        <footer class="blockquote-footer mt-3">
+                            Buddhist Proverb
+                        </footer>
+                        {% endif %}
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function dismissVivekGreeting() {
+        const greeting = document.getElementById('vivekGreeting');
+        if (greeting) {
+            greeting.style.opacity = '0';
+            greeting.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => {
+                greeting.style.display = 'none';
+            }, 500);
+        }
+    }
+    
+    // Auto-dismiss after 2 minutes
+    setTimeout(() => {
+        dismissVivekGreeting();
+    }, 120000);
+</script>
+{% endblock %}

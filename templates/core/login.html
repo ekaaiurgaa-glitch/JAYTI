@@ -1,0 +1,486 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome - JaytiPargal.in{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, 
+            rgba(244, 194, 194, 0.1) 0%, 
+            rgba(230, 230, 250, 0.15) 50%, 
+            rgba(240, 255, 240, 0.1) 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .login-container {
+        display: grid;
+        grid-template-columns: 380px 1fr;
+        max-width: 1200px;
+        width: 95%;
+        min-height: 600px;
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    @media (max-width: 992px) {
+        .login-container {
+            grid-template-columns: 1fr;
+            max-width: 500px;
+        }
+        .login-visual {
+            display: none;
+        }
+    }
+    
+    .login-form-section {
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: white;
+    }
+    
+    .login-visual {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 3rem;
+        color: white;
+        overflow: hidden;
+    }
+    
+    .flower-slideshow {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+    }
+    
+    .flower-slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        opacity: 0;
+        transition: opacity 2s ease-in-out;
+    }
+    
+    .flower-slide.active {
+        opacity: 1;
+    }
+    
+    .flower-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(244,194,194,0.85), rgba(230,230,250,0.85));
+        z-index: 1;
+    }
+    
+    .login-visual-content {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .daily-thought {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        font-style: italic;
+        line-height: 1.6;
+        text-align: center;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        margin-bottom: 2rem;
+    }
+    
+    .thought-author {
+        font-family: 'Lato', sans-serif;
+        font-size: 1rem;
+        font-style: normal;
+        opacity: 0.9;
+    }
+    
+    .time-display {
+        text-align: center;
+        margin-top: auto;
+    }
+    
+    .time-greeting {
+        font-size: 1.25rem;
+        font-weight: 300;
+        margin-bottom: 0.5rem;
+    }
+    
+    .time-message {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    
+    .current-time {
+        font-size: 3rem;
+        font-weight: 300;
+        font-family: 'Playfair Display', serif;
+        margin: 1rem 0;
+    }
+    
+    .current-date {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+    
+    .login-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .login-header h1 {
+        font-size: 2rem;
+        color: var(--dusty-rose);
+        margin-bottom: 0.5rem;
+    }
+    
+    .login-header p {
+        color: var(--muted-mauve);
+        font-size: 0.95rem;
+    }
+    
+    .form-floating {
+        margin-bottom: 1rem;
+    }
+    
+    .form-floating input {
+        border: 2px solid rgba(244,194,194,0.3);
+        border-radius: 12px;
+    }
+    
+    .form-floating label {
+        color: var(--muted-mauve);
+    }
+    
+    .btn-login {
+        width: 100%;
+        padding: 1rem;
+        font-size: 1.1rem;
+        margin-top: 1rem;
+    }
+    
+    .login-footer {
+        text-align: center;
+        margin-top: 2rem;
+        font-size: 0.85rem;
+        color: var(--muted-mauve);
+    }
+    
+    .privacy-notice {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding: 0.75rem;
+        background: rgba(244,194,194,0.1);
+        border-radius: 8px;
+        font-size: 0.8rem;
+        color: var(--muted-mauve);
+    }
+    
+    .privacy-notice i {
+        color: var(--blush-rose);
+    }
+    
+    /* Birthday Overlay */
+    .birthday-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, 
+            rgba(244,194,194,0.98), 
+            rgba(230,230,250,0.98),
+            rgba(255,218,185,0.95));
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        animation: fadeIn 1s ease;
+    }
+    
+    .birthday-content {
+        text-align: center;
+        max-width: 700px;
+        color: white;
+    }
+    
+    .birthday-icon {
+        font-size: 5rem;
+        margin-bottom: 1.5rem;
+        animation: bounce 2s infinite;
+    }
+    
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+    
+    .birthday-title {
+        font-size: 3.5rem;
+        margin-bottom: 1.5rem;
+        color: white;
+        text-shadow: 0 2px 20px rgba(0,0,0,0.1);
+    }
+    
+    .birthday-subtitle {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+        opacity: 0.95;
+    }
+    
+    .birthday-message {
+        font-size: 1.1rem;
+        line-height: 2;
+        margin-bottom: 2.5rem;
+        background: rgba(255,255,255,0.2);
+        padding: 2rem;
+        border-radius: 16px;
+        backdrop-filter: blur(10px);
+    }
+    
+    .birthday-signature {
+        font-family: 'Dancing Script', cursive;
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .btn-birthday {
+        background: white;
+        color: var(--dusty-rose);
+        border: none;
+        padding: 1rem 3rem;
+        border-radius: 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-birthday:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .hidden {
+        display: none !important;
+    }
+    
+    /* Floating particles */
+    .particle {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: rgba(255,255,255,0.6);
+        border-radius: 50%;
+        animation: float-up 4s ease-in-out infinite;
+    }
+    
+    @keyframes float-up {
+        0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
+        50% { transform: translateY(-100px) rotate(180deg); opacity: 1; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Birthday Overlay (shown only on Feb 6) -->
+{% if is_birthday %}
+<div id="birthdayOverlay" class="birthday-overlay">
+    <div class="birthday-content">
+        <div class="birthday-icon">🎂</div>
+        <h1 class="birthday-title">Happy Birthday, Jayti!</h1>
+        <p class="birthday-subtitle">29 years of strength, resilience, and grace</p>
+        
+        <div class="birthday-message">
+            <p>Dear Jayti,</p>
+            <p>
+                Through our brief conversation, I saw someone who carries herself with remarkable strength—
+                yet I also sensed the weight you've been bearing. You present a confident face to the world,
+                but I recognize that true strength also needs moments of gentleness and care.
+            </p>
+            <p>
+                On this day, I want you to know: you deserve happiness, peace, and fulfillment—not because
+                you've earned it through struggle, but simply because you exist. You deserve a life that fills
+                your heart, not just one that meets expectations.
+            </p>
+            <p>
+                My prayers are with you for healing from past hurts, for clarity in your path forward,
+                and for the courage to choose what's truly right for you. Whether I remain in your life or not,
+                know that someone sees your worth and is cheering for your flourishing.
+            </p>
+            <p>
+                This website is my gift to you—a space to gather your thoughts, plan your future,
+                and find daily support. May it serve you well.
+            </p>
+        </div>
+        
+        <p class="birthday-signature">From Vivek</p>
+        
+        <button onclick="dismissBirthday()" class="btn-birthday">
+            Enter Your Personal Space
+        </button>
+    </div>
+    
+    <!-- Floating particles -->
+    <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+    <div class="particle" style="left: 30%; animation-delay: 1s;"></div>
+    <div class="particle" style="left: 50%; animation-delay: 2s;"></div>
+    <div class="particle" style="left: 70%; animation-delay: 0.5s;"></div>
+    <div class="particle" style="left: 90%; animation-delay: 1.5s;"></div>
+</div>
+{% endif %}
+
+<div class="login-page">
+    <div class="login-container">
+        <!-- Login Form Section -->
+        <div class="login-form-section">
+            <div class="login-header">
+                <h1>JaytiPargal.in</h1>
+                <p>Your Personal Life Companion</p>
+            </div>
+            
+            {% if error %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ error }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endif %}
+            
+            <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Enter your access code" required>
+                    <label for="username"><i class="fas fa-key me-2"></i>Access Code</label>
+                </div>
+                
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                    <label for="password"><i class="fas fa-lock me-2"></i>Password</label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-login">
+                    <i class="fas fa-sign-in-alt me-2"></i>Enter
+                </button>
+            </form>
+            
+            <div class="privacy-notice">
+                <i class="fas fa-shield-alt"></i>
+                <span>Your data stays private. No external services. No tracking.</span>
+            </div>
+            
+            <div class="login-footer">
+                <p>Created with care for Jayti's journey</p>
+                <p class="font-script mt-2" style="color: var(--dusty-rose);">February 6, 2026</p>
+            </div>
+        </div>
+        
+        <!-- Visual Section -->
+        <div class="login-visual">
+            <!-- Flower Slideshow -->
+            <div class="flower-slideshow">
+                <div class="flower-slide active" style="background-image: url('https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800');"></div>
+                <div class="flower-slide" style="background-image: url('https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?w=800');"></div>
+                <div class="flower-slide" style="background-image: url('https://images.unsplash.com/photo-1468327768560-75b778cbb551?w=800');"></div>
+                <div class="flower-slide" style="background-image: url('https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=800');"></div>
+                <div class="flower-slide" style="background-image: url('https://images.unsplash.com/photo-1455659817273-f96807779a8a?w=800');"></div>
+            </div>
+            <div class="flower-overlay"></div>
+            
+            <div class="login-visual-content">
+                <div class="daily-thought">
+                    "{{ daily_content.thought.content }}"
+                    {% if daily_content.thought.author %}
+                    <p class="thought-author">— {{ daily_content.thought.author }}</p>
+                    {% endif %}
+                </div>
+                
+                <div class="time-display">
+                    <p class="time-greeting">{{ time_context.greeting }}</p>
+                    <p class="current-time" id="clock">{{ daily_content.date|date:"H:i" }}</p>
+                    <p class="current-date">{{ daily_content.date|date:"l, F d, Y" }}</p>
+                    <p class="time-message">{{ time_context.message }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Update clock
+    function updateClock() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        document.getElementById('clock').textContent = `${hours}:${minutes}`;
+    }
+    
+    setInterval(updateClock, 1000);
+    
+    // Birthday overlay dismissal
+    function dismissBirthday() {
+        const overlay = document.getElementById('birthdayOverlay');
+        overlay.style.opacity = '0';
+        overlay.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => {
+            overlay.classList.add('hidden');
+        }, 500);
+        
+        // Mark as seen
+        fetch('/api/birthday-seen/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        });
+    }
+    
+    // Auto-dismiss birthday after 60 seconds
+    {% if is_birthday %}
+    setTimeout(() => {
+        const overlay = document.getElementById('birthdayOverlay');
+        if (overlay && !overlay.classList.contains('hidden')) {
+            dismissBirthday();
+        }
+    }, 60000);
+    {% endif %}
+    
+    // Flower slideshow
+    const slides = document.querySelectorAll('.flower-slide');
+    let currentSlide = 0;
+    
+    function nextSlide() {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+    }
+    
+    // Change slide every 8 seconds
+    setInterval(nextSlide, 8000);
+</script>
+{% endblock %}
