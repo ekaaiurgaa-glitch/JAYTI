@@ -1,1 +1,1 @@
-web: python manage.py migrate && python manage.py create_initial_user && gunicorn jaytipargal.wsgi:application
+web: bash railway_startup.sh

@@ -1,9 +1,22 @@
+# Railway Deployment Configuration
+# This file configures how Railway builds and deploys your app
+
 [build]
 builder = "nixpacks"
 
 [deploy]
-startCommand = "python manage.py migrate && python manage.py create_initial_user && gunicorn jaytipargal.wsgi:application"
-healthcheckPath = "/"
-healthcheckTimeout = 100
+# Startup command with debugging and health checks
+startCommand = "bash railway_startup.sh"
+
+# Health check endpoint - must return 200 OK
+healthcheckPath = "/health/"
+healthcheckTimeout = 300
+
+# Deployment behavior
 restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 3
+restartPolicyMaxRetries = 5
+
+# Enable Railway debugger logs
+[deploy.env]
+RAILWAY_DEBUG = "true"
+PYTHONUNBUFFERED = "1"

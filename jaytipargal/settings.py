@@ -152,19 +152,31 @@ JAYTI_BIRTH_DETAILS = {
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
 GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemini-pro')
 
-# Logging configuration
+# Logging configuration - Enhanced for Railway debugging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[{levelname}] {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
     'handlers': {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
             'filename': BASE_DIR / 'logs' / 'django.log',
+            'formatter': 'verbose',
         },
         'console': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
         },
     },
     'loggers': {
@@ -173,7 +185,17 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
+        'django.request': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
         'goals': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'core': {
             'handlers': ['file', 'console'],
             'level': 'INFO',
             'propagate': True,
@@ -191,3 +213,10 @@ except OSError:
     LOGS_DIR.mkdir(parents=True, exist_ok=True)
     # Update logging file handler path
     LOGGING['handlers']['file']['filename'] = LOGS_DIR / 'django.log'
+
+# Railway-specific settings
+RAILWAY_DEBUG = os.environ.get('RAILWAY_DEBUG', 'false').lower() == 'true'
+if RAILWAY_DEBUG:
+    # More verbose logging in debug mode
+    LOGGING['loggers']['django']['level'] = 'DEBUG'
+    LOGGING['handlers']['console']['level'] = 'DEBUG'

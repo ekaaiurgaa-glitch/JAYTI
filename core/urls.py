@@ -14,4 +14,7 @@ urlpatterns = [
     
     # Birthday API
     path('api/birthday-seen/', views.birthday_seen, name='birthday_seen'),
+    
+    # Health check for Railway deployment
+    path('health/', views.health_check, name='health_check'),
 ]
