@@ -24,13 +24,33 @@ def get_daily_content():
         hash_val = int(hashlib.md5(date_seed.encode()).hexdigest(), 16)
         thought = thoughts[hash_val % len(thoughts)]
     else:
-        # Default thoughts if none in database
+        # Default thoughts if none in database (25 quotes for variety)
         default_thoughts = [
             {"content": "The lotus blooms most beautifully from the deepest and thickest mud.", "author": "Buddhist Proverb"},
             {"content": "Your strength is not measured by how much you can carry, but by how you rise after being broken.", "author": "Unknown"},
             {"content": "Every ending is a new beginning. Trust the journey.", "author": "Unknown"},
             {"content": "You are stronger than you know, more capable than you imagine, and loved more than you realize.", "author": "Unknown"},
             {"content": "The path to healing begins with a single breath of self-compassion.", "author": "Unknown"},
+            {"content": "Courage doesn't always roar. Sometimes courage is the quiet voice at the end of the day saying, 'I will try again tomorrow.'", "author": "Mary Anne Radmacher"},
+            {"content": "Believe you can and you're halfway there.", "author": "Theodore Roosevelt"},
+            {"content": "Success is not final, failure is not fatal: it is the courage to continue that counts.", "author": "Winston Churchill"},
+            {"content": "The only way to do great work is to love what you do.", "author": "Steve Jobs"},
+            {"content": "Your present circumstances don't determine where you go; they merely determine where you start.", "author": "Nido Qubein"},
+            {"content": "Be gentle with yourself. You're doing the best you can.", "author": "Unknown"},
+            {"content": "In the middle of difficulty lies opportunity.", "author": "Albert Einstein"},
+            {"content": "The best time to plant a tree was 20 years ago. The second best time is now.", "author": "Chinese Proverb"},
+            {"content": "You are allowed to be both a masterpiece and a work in progress simultaneously.", "author": "Sophia Bush"},
+            {"content": "Don't watch the clock; do what it does. Keep going.", "author": "Sam Levenson"},
+            {"content": "The flower that blooms in adversity is the most rare and beautiful of all.", "author": "Mulan"},
+            {"content": "You don't have to be perfect to be amazing.", "author": "Unknown"},
+            {"content": "Difficult roads often lead to beautiful destinations.", "author": "Unknown"},
+            {"content": "Small steps in the right direction can turn out to be the biggest step of your life.", "author": "Unknown"},
+            {"content": "Your value doesn't decrease based on someone's inability to see your worth.", "author": "Unknown"},
+            {"content": "Champions keep playing until they get it right.", "author": "Billie Jean King"},
+            {"content": "Fall seven times, stand up eight.", "author": "Japanese Proverb"},
+            {"content": "The only person you are destined to become is the person you decide to be.", "author": "Ralph Waldo Emerson"},
+            {"content": "Progress, not perfection.", "author": "Unknown"},
+            {"content": "Success usually comes to those who are too busy to be looking for it.", "author": "Henry David Thoreau"},
         ]
         thought_data = default_thoughts[hash_val % len(default_thoughts)]
         thought = type('obj', (object,), {
@@ -112,21 +132,39 @@ def logout_view(request):
 @login_required
 def dashboard(request):
     """Main dashboard with navigation to all modules"""
-    # Get recent activity counts
     from notes.models import Note
     from diary.models import DiaryEntry
     from goals.models import Goal, Task
+    from datetime import datetime
     
     recent_notes = Note.objects.filter(user=request.user).count()
     recent_diary = DiaryEntry.objects.filter(user=request.user).count()
     active_goals = Goal.objects.filter(user=request.user, status='active').count()
     pending_tasks = Task.objects.filter(goal__user=request.user, status='pending').count()
     
+    # Check if today is February 6, 2026 (Birthday Launch)
+    today = datetime.now()
+    is_birthday_launch = (today.year == 2026 and today.month == 2 and today.day == 6)
+    
+    # Check for Vivek's message (first login of day or birthday)
+    # Use session to track if message has been seen
+    session_key = f'vivek_message_seen_{today.strftime("%Y%m%d")}'
+    has_seen_today = request.session.get(session_key, False)
+    
+    # Show message on birthday OR on first login of the day
+    show_vivek_message = (is_birthday_launch or not has_seen_today)
+    
+    if show_vivek_message and not has_seen_today:
+        request.session[session_key] = True
+        request.session.modified = True
+    
     context = {
         'recent_notes': recent_notes,
         'recent_diary': recent_diary,
         'active_goals': active_goals,
         'pending_tasks': pending_tasks,
+        'show_vivek_message': show_vivek_message,
+        'is_birthday_launch': is_birthday_launch,
     }
     
     return render(request, 'core/dashboard.html', context)
