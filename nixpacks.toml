@@ -1,12 +1,16 @@
 # Nixpacks configuration for Railway
 # Required system libraries for pyswisseph
 
-[phases.build]
-aptPackages = ["libsqlite3-dev", "sqlite3", "libsqlite3-0"]
-
 [phases.setup]
-nixPkgs = ["sqlite"]
+# Install Python and SQLite via nix
+nixPkgs = ["python313", "sqlite"]
+
+[phases.build]
+# Install SQLite development libraries via apt
+aptPackages = ["libsqlite3-dev", "sqlite3", "libsqlite3-0"]
 
 [variables]
 # Ensure library path is set
 LD_LIBRARY_PATH = "/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
+# Set Python path
+PYTHONBIN = "python3.13"
