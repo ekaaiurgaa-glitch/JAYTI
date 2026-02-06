@@ -1,31 +1,72 @@
-name: Django CI
+name: 🔍 Django CI - Build & Test
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
     branches: [main]
 
+env:
+  PYTHON_VERSION: '3.11'
+
 jobs:
   test:
+    name: 🧪 Test & Validate
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
-    
-    - name: Install Dependencies
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+        
+    - name: 📦 Install Dependencies
       run: |
-        python -m pip install --upgrade pip
+        python -m pip install --upgrade pip setuptools wheel
         pip install -r requirements.txt
-    
-    - name: Run Tests
+        
+    - name: 🔍 Django System Check
       env:
-        SECRET_KEY: test-secret-key-for-ci
+        SECRET_KEY: django-ci-test-secret-key-not-for-production
         DEBUG: 'False'
+        DATABASE_URL: sqlite:///ci_test_db.sqlite3
       run: |
-        python manage.py check
+        echo "🔍 Running Django system checks..."
+        python manage.py check --settings=jaytipargal.settings
+        
+    - name: 🔄 Check Migrations
+      env:
+        SECRET_KEY: django-ci-test-secret-key-not-for-production
+        DEBUG: 'False'
+        DATABASE_URL: sqlite:///ci_test_db.sqlite3
+      run: |
+        echo "🔄 Checking for unapplied migrations..."
+        python manage.py makemigrations --check --dry-run --settings=jaytipargal.settings
+        
+    - name: 🗄️ Run Migrations
+      env:
+        SECRET_KEY: django-ci-test-secret-key-not-for-production
+        DEBUG: 'False'
+        DATABASE_URL: sqlite:///ci_test_db.sqlite3
+      run: |
+        echo "🗄️ Running migrations..."
+        python manage.py migrate --settings=jaytipargal.settings
+        
+    - name: 📊 Collect Static Files
+      env:
+        SECRET_KEY: django-ci-test-secret-key-not-for-production
+        DEBUG: 'False'
+        DATABASE_URL: sqlite:///ci_test_db.sqlite3
+      run: |
+        echo "📊 Collecting static files..."
+        python manage.py collectstatic --noinput --settings=jaytipargal.settings
+        
+    - name: ✅ Build Success
+      run: |
+        echo "✅ All CI checks passed!"
+        echo "🔢 Commit: ${{ github.sha }}"
+        echo "👤 Author: ${{ github.actor }}"
