@@ -1,504 +1,164 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ goal.title }} - jayti{% endblock %}
-
-{% block extra_css %}
-<style>
-    .goal-detail-header {
-        background: linear-gradient(135deg, var(--blush-rose) 0%, var(--dusty-rose) 100%);
-        padding: 3rem 0;
-        margin-bottom: 2rem;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .goal-detail-header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
-        animation: shimmer 6s ease-in-out infinite;
-    }
-    
-    @keyframes shimmer {
-        0%, 100% { transform: rotate(0deg); }
-        50% { transform: rotate(180deg); }
-    }
-    
-    .goal-title {
-        color: white;
-        font-size: 2.5rem;
-        position: relative;
-        z-index: 1;
-    }
-    
-    .goal-meta {
-        color: rgba(255,255,255,0.9);
-        position: relative;
-        z-index: 1;
-    }
-    
-    .role-badge {
-        display: inline-block;
-        padding: 0.4rem 1rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .role-digital_marketing { background: linear-gradient(135deg, #E6E6FA, #D4D4F0); color: #6B5B95; }
-    .role-brand_management { background: linear-gradient(135deg, #F4C2C2, #E6A8A8); color: #8B5A5A; }
-    .role-content_strategy { background: linear-gradient(135deg, #F0FFF0, #D0F0D0); color: #5A8B5A; }
-    .role-market_research { background: linear-gradient(135deg, #FFE4E1, #FFD0C8); color: #8B6B5A; }
-    .role-product_marketing { background: linear-gradient(135deg, #E0FFFF, #C8F0F0); color: #5A7A8B; }
-    .role-social_media { background: linear-gradient(135deg, #FFF8DC, #F0E8C0); color: #8B7A3A; }
-    .role-seo_sem { background: linear-gradient(135deg, #F5F5DC, #E5E5C0); color: #6B6B4A; }
-    .role-marketing_analytics { background: linear-gradient(135deg, #E6E6FA, #D8D8F0); color: #5A5A8B; }
-    
-    .progress-section {
-        background: white;
-        border-radius: 20px;
-        padding: 2rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-    }
-    
-    .progress-circle {
-        width: 150px;
-        height: 150px;
-        margin: 0 auto;
-        position: relative;
-    }
-    
-    .progress-circle svg {
-        transform: rotate(-90deg);
-    }
-    
-    .progress-circle-bg {
-        fill: none;
-        stroke: var(--cream);
-        stroke-width: 8;
-    }
-    
-    .progress-circle-bar {
-        fill: none;
-        stroke: url(#progressGradient);
-        stroke-width: 8;
-        stroke-linecap: round;
-        transition: stroke-dashoffset 1s ease;
-    }
-    
-    .progress-text {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 2rem;
-        font-weight: 700;
-        color: var(--dusty-rose);
-    }
-    
-    .section-card {
-        background: white;
-        border-radius: 20px;
-        padding: 2rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-        height: 100%;
-    }
-    
-    .section-title {
-        font-size: 1.3rem;
-        color: var(--warm-charcoal);
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-    
-    .section-title i {
-        color: var(--dusty-rose);
-    }
-    
-    .task-card {
-        background: var(--cream);
-        border-radius: 12px;
-        padding: 1.25rem;
-        margin-bottom: 1rem;
-        transition: all 0.3s ease;
-        border-left: 4px solid var(--blush-rose);
-    }
-    
-    .task-card:hover {
-        transform: translateX(5px);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    }
-    
-    .task-card.done {
-        border-left-color: #90EE90;
-        opacity: 0.7;
-    }
-    
-    .task-card.in_progress {
-        border-left-color: #FFD700;
-    }
-    
-    .task-card.blocked {
-        border-left-color: #FF6B6B;
-    }
-    
-    .task-card.at_risk {
-        border-left-color: #FFA500;
-    }
-    
-    .task-card.overdue {
-        border-left-color: #DC143C;
-    }
-    
-    .task-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: start;
-        margin-bottom: 0.75rem;
-    }
-    
-    .task-title {
-        font-weight: 600;
-        color: var(--warm-charcoal);
-        margin: 0;
-    }
-    
-    .task-status {
-        padding: 0.25rem 0.75rem;
-        border-radius: 15px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-    
-    .status-pending { background: #E0E0E0; color: #666; }
-    .status-in_progress { background: #FFD700; color: #333; }
-    .status-done { background: #90EE90; color: #2E7D32; }
-    .status-blocked { background: #FF6B6B; color: white; }
-    .status-at_risk { background: #FFA500; color: white; }
-    .status-overdue { background: #DC143C; color: white; }
-    
-    .task-department {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.85rem;
-        color: var(--muted-mauve);
-        margin-bottom: 0.5rem;
-    }
-    
-    .task-due {
-        font-size: 0.85rem;
-        color: var(--muted-mauve);
-    }
-    
-    .task-actions {
-        display: flex;
-        gap: 0.5rem;
-        margin-top: 1rem;
-    }
-    
-    .milestone-item {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 1rem;
-        background: var(--cream);
-        border-radius: 12px;
-        margin-bottom: 0.75rem;
-    }
-    
-    .milestone-check {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--dusty-rose);
-        border: 2px solid var(--blush-rose);
-    }
-    
-    .milestone-check.achieved {
-        background: linear-gradient(135deg, #90EE90, #7FDD7F);
-        border-color: #90EE90;
-        color: white;
-    }
-    
-    .milestone-content {
-        flex: 1;
-    }
-    
-    .milestone-title {
-        font-weight: 600;
-        color: var(--warm-charcoal);
-        margin: 0;
-    }
-    
-    .milestone-date {
-        font-size: 0.85rem;
-        color: var(--muted-mauve);
-    }
-    
-    .action-btn {
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        border: none;
-        font-size: 0.85rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-    
-    .action-btn:hover {
-        transform: translateY(-2px);
-    }
-    
-    .empty-tasks {
-        text-align: center;
-        padding: 3rem 2rem;
-        color: var(--muted-mauve);
-    }
-    
-    .empty-tasks i {
-        font-size: 3rem;
-        color: var(--blush-rose);
-        margin-bottom: 1rem;
-    }
-</style>
-{% endblock %}
+{% block title %}{{ goal.title }} - Goals{% endblock %}
 
 {% block content %}
-<svg width="0" height="0" style="position: absolute;">
-    <defs>
-        <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" style="stop-color:#F4C2C2"/>
-            <stop offset="100%" style="stop-color:#D4A5A5"/>
-        </linearGradient>
-    </defs>
-</svg>
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'goal_list' %}">Goals</a></li>
+            <li class="breadcrumb-item active">{{ goal.title|truncatechars:30 }}</li>
+        </ol>
+    </nav>
 
-<div class="goal-detail-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <span class="role-badge role-{{ goal.role_category }} mb-3">{{ goal.get_role_category_display }}</span>
-                <h1 class="goal-title">{{ goal.title }}</h1>
-                <p class="goal-meta mt-2">
-                    <i class="fas fa-layer-group me-2"></i>{{ goal.get_experience_level_display }}
-                    <span class="mx-3">|</span>
-                    <i class="fas fa-hourglass-half me-2"></i>{{ goal.get_time_horizon_display }}
-                    <span class="mx-3">|</span>
-                    <i class="fas fa-calendar-alt me-2"></i>Target: {{ goal.target_date|date:"M d, Y" }}
-                </p>
-            </div>
-            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
-                <div class="progress-section">
-                    <div class="progress-circle">
-                        <svg width="150" height="150">
-                            <circle class="progress-circle-bg" cx="75" cy="75" r="65"></circle>
-                            <circle class="progress-circle-bar" cx="75" cy="75" r="65" 
-                                    stroke-dasharray="408.4" 
-                                    stroke-dashoffset="{{ 408.4|add:-goal.completion_percentage|divisibleby:100|add:goal.completion_percentage|floatformat:0 }}"
-                                    style="stroke-dashoffset: {{ 408.4|add:-goal.completion_percentage|floatformat:0 }}"></circle>
-                        </svg>
-                        <div class="progress-text">{{ goal.completion_percentage }}%</div>
+    <!-- Goal Header -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="d-flex gap-2 mb-2">
+                        <span class="badge bg-primary">{{ goal.get_time_horizon_display }}</span>
+                        <span class="badge bg-secondary">{{ goal.get_role_category_display }}</span>
+                        <span class="badge bg-info">{{ goal.get_experience_level_display }}</span>
                     </div>
-                    <p class="text-center mb-0 mt-2" style="color: var(--muted-mauve);">Complete</p>
+                    <h3 class="mb-1" style="color: var(--dusty-rose);">{{ goal.title }}</h3>
+                    <p class="text-muted mb-0">Target: {{ goal.target_date|date:"F d, Y" }}</p>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{% url 'goal_edit' goal.pk %}">
+                            <i class="fas fa-edit me-2"></i>Edit Goal
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'regenerate_ai_tasks' goal.pk %}">
+                            <i class="fas fa-magic me-2"></i>Regenerate AI Tasks
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="{% url 'goal_delete' goal.pk %}">
+                            <i class="fas fa-trash-alt me-2"></i>Delete Goal
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <p>{{ goal.description|linebreaks }}</p>
+            
+            <div class="mt-4">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Overall Progress</span>
+                    <span class="fw-bold">{{ goal.completion_percentage }}%</span>
+                </div>
+                <div class="progress" style="height: 12px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                         role="progressbar" style="width: {{ goal.completion_percentage }}%">
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="container">
-    <!-- Description -->
-    {% if goal.description %}
+    <!-- Tasks by Department -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="section-card">
-                <h3 class="section-title">
-                    <i class="fas fa-align-left"></i>
-                    Description
-                </h3>
-                <p class="mb-0" style="line-height: 1.8; color: var(--warm-charcoal);">
-                    {{ goal.description|linebreaksbr }}
-                </p>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4><i class="fas fa-tasks me-2"></i>Tasks</h4>
+                <a href="{% url 'task_create' goal.pk %}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus me-1"></i>Add Task
+                </a>
+            </div>
+
+            {% if tasks %}
+                <!-- Department Tabs -->
+                <ul class="nav nav-tabs mb-3" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#all-tasks">All</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#strategy">Strategy</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#finance">Finance</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#hr">HR</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#operations">Operations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#sales">Sales</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <div id="all-tasks" class="tab-pane fade show active">
+                        {% include "goals/_task_list.html" with tasks=tasks %}
+                    </div>
+                    <div id="strategy" class="tab-pane fade">
+                        {% include "goals/_task_list.html" with tasks=tasks_by_status.pending|add:tasks_by_status.in_progress|add:tasks_by_status.done %}
+                    </div>
+                    <!-- Other department tabs handled similarly -->
+                </div>
+            {% else %}
+                <div class="text-center py-5 bg-light rounded">
+                    <i class="fas fa-tasks text-muted mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="text-muted">No tasks yet</h5>
+                    <p class="text-muted">AI-generated tasks should appear soon, or you can add tasks manually.</p>
+                    <a href="{% url 'task_create' goal.pk %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Add First Task
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Milestones -->
+    {% if milestones %}
+    <div class="row">
+        <div class="col-12">
+            <h4 class="mb-3"><i class="fas fa-flag me-2"></i>Milestones</h4>
+            <div class="timeline">
+                {% for milestone in milestones %}
+                <div class="card mb-2 {% if milestone.is_achieved %}border-success{% endif %}">
+                    <div class="card-body py-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                {% if milestone.is_achieved %}
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                {% else %}
+                                    <i class="far fa-circle text-muted me-2"></i>
+                                {% endif %}
+                                <strong>{{ milestone.title }}</strong>
+                            </div>
+                            <small class="text-muted">{{ milestone.target_date|date:"M Y" }}</small>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
     {% endif %}
-
-    <div class="row g-4">
-        <!-- Tasks Column -->
-        <div class="col-lg-8">
-            <div class="section-card">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3 class="section-title mb-0">
-                        <i class="fas fa-tasks"></i>
-                        Tasks
-                    </h3>
-                    <a href="{% url 'task_create' goal.pk %}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-plus me-1"></i>Add Task
-                    </a>
-                </div>
-
-                {% if tasks %}
-                    <!-- Pending Tasks -->
-                    {% if tasks_by_status.pending %}
-                    <h5 class="mb-3" style="color: var(--muted-mauve);">
-                        <i class="fas fa-clock me-2"></i>Pending
-                    </h5>
-                    {% for task in tasks_by_status.pending %}
-                    <div class="task-card">
-                        <div class="task-header">
-                            <h6 class="task-title">{{ task.title }}</h6>
-                            <span class="task-status status-{{ task.status }}">{{ task.get_status_display }}</span>
-                        </div>
-                        <div class="task-department">
-                            <i class="fas fa-building"></i>
-                            {{ task.get_department_display }}
-                        </div>
-                        <p class="mb-2" style="font-size: 0.9rem; color: var(--warm-charcoal);">
-                            {{ task.description|truncatewords:20|default:"No description" }}
-                        </p>
-                        <div class="task-due">
-                            <i class="fas fa-calendar me-1"></i>Due: {{ task.due_date|date:"M d, Y" }}
-                        </div>
-                        <div class="task-actions">
-                            <a href="{% url 'task_update' task.pk %}" class="action-btn" style="background: var(--blush-rose); color: white;">
-                                <i class="fas fa-edit me-1"></i>Update
-                            </a>
-                            <a href="{% url 'task_delete' task.pk %}" class="action-btn" style="background: #ffebee; color: #dc3545;">
-                                <i class="fas fa-trash me-1"></i>Delete
-                            </a>
-                        </div>
-                    </div>
-                    {% endfor %}
-                    {% endif %}
-
-                    <!-- In Progress Tasks -->
-                    {% if tasks_by_status.in_progress %}
-                    <h5 class="mb-3 mt-4" style="color: var(--muted-mauve);">
-                        <i class="fas fa-spinner me-2"></i>In Progress
-                    </h5>
-                    {% for task in tasks_by_status.in_progress %}
-                    <div class="task-card in_progress">
-                        <div class="task-header">
-                            <h6 class="task-title">{{ task.title }}</h6>
-                            <span class="task-status status-{{ task.status }}">{{ task.get_status_display }}</span>
-                        </div>
-                        <div class="task-department">
-                            <i class="fas fa-building"></i>
-                            {{ task.get_department_display }}
-                        </div>
-                        <p class="mb-2" style="font-size: 0.9rem; color: var(--warm-charcoal);">
-                            {{ task.description|truncatewords:20|default:"No description" }}
-                        </p>
-                        <div class="task-due">
-                            <i class="fas fa-calendar me-1"></i>Due: {{ task.due_date|date:"M d, Y" }}
-                        </div>
-                        <div class="task-actions">
-                            <a href="{% url 'task_update' task.pk %}" class="action-btn" style="background: var(--blush-rose); color: white;">
-                                <i class="fas fa-edit me-1"></i>Update
-                            </a>
-                        </div>
-                    </div>
-                    {% endfor %}
-                    {% endif %}
-
-                    <!-- Done Tasks -->
-                    {% if tasks_by_status.done %}
-                    <h5 class="mb-3 mt-4" style="color: var(--muted-mauve);">
-                        <i class="fas fa-check-circle me-2"></i>Completed
-                    </h5>
-                    {% for task in tasks_by_status.done %}
-                    <div class="task-card done">
-                        <div class="task-header">
-                            <h6 class="task-title" style="text-decoration: line-through;">{{ task.title }}</h6>
-                            <span class="task-status status-{{ task.status }}">{{ task.get_status_display }}</span>
-                        </div>
-                        <div class="task-due">
-                            <i class="fas fa-check me-1"></i>Completed {{ task.completed_at|date:"M d, Y"|default:"recently" }}
-                        </div>
-                    </div>
-                    {% endfor %}
-                    {% endif %}
-
-                {% else %}
-                <div class="empty-tasks">
-                    <i class="fas fa-clipboard-list"></i>
-                    <p>No tasks yet</p>
-                    <a href="{% url 'task_create' goal.pk %}" class="btn btn-outline-primary btn-sm">
-                        <i class="fas fa-plus me-1"></i>Create First Task
-                    </a>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- Sidebar -->
-        <div class="col-lg-4">
-            <!-- Milestones -->
-            <div class="section-card mb-4">
-                <h3 class="section-title">
-                    <i class="fas fa-flag-checkered"></i>
-                    Milestones
-                </h3>
-                {% if milestones %}
-                {% for milestone in milestones %}
-                <div class="milestone-item">
-                    <div class="milestone-check {% if milestone.is_achieved %}achieved{% endif %}">
-                        {% if milestone.is_achieved %}
-                        <i class="fas fa-check"></i>
-                        {% else %}
-                        <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
-                        {% endif %}
-                    </div>
-                    <div class="milestone-content">
-                        <p class="milestone-title">{{ milestone.title }}</p>
-                        <p class="milestone-date mb-0">
-                            <i class="fas fa-calendar me-1"></i>{{ milestone.target_date|date:"M d, Y" }}
-                        </p>
-                    </div>
-                </div>
-                {% endfor %}
-                {% else %}
-                <p class="text-muted text-center py-3">No milestones set</p>
-                {% endif %}
-            </div>
-
-            <!-- Actions -->
-            <div class="section-card">
-                <h3 class="section-title">
-                    <i class="fas fa-cog"></i>
-                    Actions
-                </h3>
-                <div class="d-grid gap-2">
-                    <a href="{% url 'goal_edit' goal.pk %}" class="btn btn-outline-primary">
-                        <i class="fas fa-edit me-2"></i>Edit Goal
-                    </a>
-                    <a href="{% url 'regenerate_tasks' goal.pk %}" class="btn btn-outline-primary">
-                        <i class="fas fa-magic me-2"></i>Regenerate Tasks
-                    </a>
-                    <a href="{% url 'goal_board' %}" class="btn btn-outline-primary">
-                        <i class="fas fa-columns me-2"></i>View Board
-                    </a>
-                    <hr class="my-3">
-                    <a href="{% url 'goal_delete' goal.pk %}" class="btn btn-outline-danger">
-                        <i class="fas fa-trash me-2"></i>Delete Goal
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
+
+{% comment %}Task List Partial{% endcomment %}
+{% block extra_js %}
+<script>
+function updateTaskStatus(taskId, status) {
+    fetch(`/goals/task/${taskId}/update/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: `status=${status}`
+    }).then(() => location.reload());
+}
+</script>
+{% endblock %}
 {% endblock %}
