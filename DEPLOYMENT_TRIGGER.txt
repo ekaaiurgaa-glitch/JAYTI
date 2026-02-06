@@ -1,0 +1,8 @@
+DEPLOYMENT TRIGGER
+==================
+Date: 2026-02-06
+Time: 23:44 IST
+Trigger: Automatic deployment to Railway
+Status: READY
+
+This file triggers GitHub Actions workflow for Railway deployment.
