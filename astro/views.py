@@ -82,6 +82,21 @@ NAKSHATRAS = [
     ('Revati', 346.66, 'Mercury'),
 ]
 
+# Vimshottari Dasha Constants
+DASHA_PERIODS = {
+    'Ketu': 7,
+    'Venus': 20,
+    'Sun': 6,
+    'Moon': 10,
+    'Mars': 7,
+    'Rahu': 18,
+    'Jupiter': 16,
+    'Saturn': 19,
+    'Mercury': 17,
+}
+
+DASHA_SEQUENCE = ['Ketu', 'Venus', 'Sun', 'Moon', 'Mars', 'Rahu', 'Jupiter', 'Saturn', 'Mercury']
+
 RASHI_INFO = {
     'aries': {'element': 'Fire', 'quality': 'Cardinal', 'symbol': '♈', 'lord': 'mars'},
     'taurus': {'element': 'Earth', 'quality': 'Fixed', 'symbol': '♉', 'lord': 'venus'},
@@ -254,6 +269,207 @@ def calculate_house_scores(planet_positions, planet_houses):
     return scores
 
 
+# ==================== VIMSHOTTARI DASHA CALCULATIONS ====================
+
+def calculate_dasha_balance(birth_jd, moon_degree):
+    """
+    Calculate the Dasha balance at birth based on Moon's position.
+    Returns which mahadasha lord is running at birth and how much is remaining.
+    """
+    # Find which nakshatra the Moon is in
+    nakshatra_index = int(moon_degree / 13.3333) % 27
+    nakshatra_name, start_deg, dasha_lord = NAKSHATRAS[nakshatra_index]
+    
+    # Calculate how much of the nakshatra has passed
+    nakshatra_progress = (moon_degree - start_deg) / 13.3333
+    
+    # Total years for this dasha lord
+    total_years = DASHA_PERIODS[dasha_lord]
+    
+    # Years already passed = progress * total years
+    years_passed = nakshatra_progress * total_years
+    
+    # Years remaining
+    years_remaining = total_years - years_passed
+    
+    return {
+        'starting_lord': dasha_lord,
+        'years_remaining': years_remaining,
+        'years_passed': years_passed,
+        'total_years': total_years,
+        'nakshatra': nakshatra_name,
+    }
+
+
+def generate_vimshottari_dasha(birth_jd, moon_degree, birth_date):
+    """
+    Generate complete Vimshottari Dasha sequence from birth.
+    Returns list of mahadashas with start/end dates.
+    """
+    dasha_balance = calculate_dasha_balance(birth_jd, moon_degree)
+    
+    # Find starting position in DASHA_SEQUENCE
+    start_index = DASHA_SEQUENCE.index(dasha_balance['starting_lord'])
+    
+    dasha_periods = []
+    current_date = birth_date
+    
+    # First mahadasha (partial)
+    first_lord = dasha_balance['starting_lord']
+    first_duration = dasha_balance['years_remaining']
+    first_end = current_date + timedelta(days=int(first_duration * 365.25))
+    
+    dasha_periods.append({
+        'lord': first_lord,
+        'start_date': current_date,
+        'end_date': first_end,
+        'duration_years': first_duration,
+        'is_running': False,  # Will be set later
+    })
+    
+    current_date = first_end
+    
+    # Continue with full dashas
+    next_index = (start_index + 1) % 9
+    
+    # Generate next 9 periods (full cycle from next lord)
+    for _ in range(9):
+        lord = DASHA_SEQUENCE[next_index]
+        duration = DASHA_PERIODS[lord]
+        end_date = current_date + timedelta(days=int(duration * 365.25))
+        
+        dasha_periods.append({
+            'lord': lord,
+            'start_date': current_date,
+            'end_date': end_date,
+            'duration_years': duration,
+            'is_running': False,
+        })
+        
+        current_date = end_date
+        next_index = (next_index + 1) % 9
+    
+    return dasha_periods
+
+
+def get_current_mahadasha(dasha_periods, current_date=None):
+    """Find which mahadasha is currently running"""
+    if current_date is None:
+        current_date = datetime.now().date()
+    
+    for period in dasha_periods:
+        if period['start_date'] <= current_date < period['end_date']:
+            period['is_running'] = True
+            return period
+    
+    return None
+
+
+def get_dasha_interpretation(lord):
+    """Get interpretation for a dasha lord"""
+    interpretations = {
+        'Sun': {
+            'theme': 'Authority, Recognition, Career Growth',
+            'focus': 'Professional advancement, leadership opportunities, government connections',
+            'advice': 'Take charge of your career. Seek recognition for your work. Focus on long-term goals.',
+            'challenges': 'Ego conflicts, health issues related to heart/eyes',
+        },
+        'Moon': {
+            'theme': 'Emotions, Home, Public Connection',
+            'focus': 'Emotional well-being, family matters, public image, creative pursuits',
+            'advice': 'Nurture your emotional needs. Strengthen family bonds. Trust your intuition.',
+            'challenges': 'Mood fluctuations, over-sensitivity, mother-related concerns',
+        },
+        'Mars': {
+            'theme': 'Energy, Courage, Action',
+            'focus': 'Initiating projects, physical vitality, competition, property matters',
+            'advice': 'Channel your energy constructively. Take bold action. Stand up for yourself.',
+            'challenges': 'Impatience, conflicts, accidents, inflammation',
+        },
+        'Rahu': {
+            'theme': 'Ambition, Foreign Connections, Material Gains',
+            'focus': 'Unconventional paths, technology, foreign affairs, sudden opportunities',
+            'advice': 'Embrace change and innovation. Think outside the box. Manage desires wisely.',
+            'challenges': 'Illusions, obsessions, foreign-related stress, health mysteries',
+        },
+        'Jupiter': {
+            'theme': 'Wisdom, Expansion, Prosperity',
+            'focus': 'Higher learning, spirituality, children, wealth growth, guidance',
+            'advice': 'Seek knowledge and wisdom. Expand your horizons. Trust in abundance.',
+            'challenges': 'Over-optimism, weight gain, excesses, philosophical conflicts',
+        },
+        'Saturn': {
+            'theme': 'Discipline, Karma, Structure',
+            'focus': 'Hard work, responsibility, long-term planning, maturity, service',
+            'advice': 'Embrace discipline and patience. Do the hard work. Build lasting foundations.',
+            'challenges': 'Delays, restrictions, health issues, heavy responsibilities',
+        },
+        'Mercury': {
+            'theme': 'Communication, Intellect, Commerce',
+            'focus': 'Learning, writing, business, communication skills, adaptability',
+            'advice': 'Sharpen your communication. Pursue learning. Stay flexible and curious.',
+            'challenges': 'Nervousness, overthinking, communication misunderstandings',
+        },
+        'Ketu': {
+            'theme': 'Spirituality, Detachment, Past Karma',
+            'focus': 'Letting go, spiritual growth, introspection, liberation from attachments',
+            'advice': 'Practice detachment from outcomes. Focus on spiritual growth. Release the past.',
+            'challenges': 'Confusion, losses, isolation, sudden separations',
+        },
+        'Venus': {
+            'theme': 'Love, Beauty, Pleasure, Relationships',
+            'focus': 'Romantic relationships, creativity, luxury, artistic pursuits, comfort',
+            'advice': 'Cultivate beauty and harmony in life. Nurture relationships. Enjoy pleasures mindfully.',
+            'challenges': 'Over-indulgence, relationship issues, financial excesses',
+        },
+    }
+    
+    return interpretations.get(lord, {
+        'theme': 'Personal Growth and Transformation',
+        'focus': 'Self-discovery and life lessons',
+        'advice': 'Stay mindful and present',
+        'challenges': 'Unexpected changes',
+    })
+
+
+def calculate_antardasha(mahadasha_lord, mahadasha_start, mahadasha_end):
+    """
+    Calculate Antardasha (sub-periods) within a Mahadasha.
+    Each mahadasha is divided into 9 antardashas in the same sequence.
+    """
+    antardashas = []
+    mahadasha_duration = (mahadasha_end - mahadasha_start).days
+    
+    # Find starting position
+    start_index = DASHA_SEQUENCE.index(mahadasha_lord)
+    
+    current_date = mahadasha_start
+    
+    for i in range(9):
+        lord_index = (start_index + i) % 9
+        lord = DASHA_SEQUENCE[lord_index]
+        
+        # Duration is proportional
+        # Formula: (Antardasha Lord Years / 120) * Mahadasha Duration
+        antardasha_years = DASHA_PERIODS[lord]
+        duration_days = int((antardasha_years / 120) * mahadasha_duration)
+        
+        end_date = current_date + timedelta(days=duration_days)
+        
+        antardashas.append({
+            'lord': lord,
+            'start_date': current_date,
+            'end_date': end_date,
+            'duration_days': duration_days,
+        })
+        
+        current_date = end_date
+    
+    return antardashas
+
+
+# ==================== MAIN VIEWS ====================
+
 def calculate_birth_chart():
     """Calculate complete birth chart for Jayti"""
     jd = calculate_julian_day(
@@ -304,10 +520,18 @@ def calculate_birth_chart():
             'score': house_scores.get(house_num, 15),
         }
     
+    # Calculate Dasha
+    birth_date = datetime(JAYTI_BIRTH_DATA['year'], JAYTI_BIRTH_DATA['month'], JAYTI_BIRTH_DATA['day']).date()
+    moon_degree = planet_positions.get('moon', {}).get('degree', 0)
+    dasha_periods = generate_vimshottari_dasha(jd, moon_degree, birth_date)
+    current_dasha = get_current_mahadasha(dasha_periods)
+    
     return {
         'ascendant': ascendant_rashi,
         'houses': houses,
         'planets': planet_positions,
+        'dasha_periods': dasha_periods,
+        'current_dasha': current_dasha,
     }
 
 
@@ -320,6 +544,7 @@ def astro_dashboard(request):
         'birth_data': JAYTI_BIRTH_DATA,
         'ascendant': chart_data['ascendant'],
         'rashi_info': RASHI_INFO[chart_data['ascendant']],
+        'current_dasha': chart_data['current_dasha'],
     }
     return render(request, 'astro/astro_dashboard.html', context)
 
@@ -436,25 +661,85 @@ def house_details(request):
 
 
 @login_required
+def dasha_periods(request):
+    """Display Vimshottari Dasha periods"""
+    chart_data = calculate_birth_chart()
+    
+    dasha_periods = chart_data['dasha_periods']
+    current_dasha = chart_data['current_dasha']
+    
+    # Get interpretation for current dasha
+    current_interpretation = None
+    if current_dasha:
+        current_interpretation = get_dasha_interpretation(current_dasha['lord'])
+        
+        # Calculate antardashas for current mahadasha
+        antardashas = calculate_antardasha(
+            current_dasha['lord'],
+            current_dasha['start_date'],
+            current_dasha['end_date']
+        )
+        
+        # Find current antardasha
+        today = datetime.now().date()
+        current_antardasha = None
+        for ad in antardashas:
+            if ad['start_date'] <= today < ad['end_date']:
+                current_antardasha = ad
+                break
+    else:
+        antardashas = []
+        current_antardasha = None
+    
+    # Prepare dasha display with interpretations
+    dasha_display = []
+    for period in dasha_periods:
+        interpretation = get_dasha_interpretation(period['lord'])
+        dasha_display.append({
+            **period,
+            'interpretation': interpretation,
+            'is_past': period['end_date'] < datetime.now().date(),
+            'is_future': period['start_date'] > datetime.now().date(),
+        })
+    
+    context = {
+        'dasha_periods': dasha_display,
+        'current_dasha': current_dasha,
+        'current_interpretation': current_interpretation,
+        'antardashas': antardashas,
+        'current_antardasha': current_antardasha,
+    }
+    return render(request, 'astro/dasha_periods.html', context)
+
+
+@login_required
 def predictions(request):
-    """90-day forward predictions based on current transits"""
+    """90-day forward predictions based on current transits and dasha"""
     today = datetime.now().date()
     
     # Calculate current chart
     chart_data = calculate_birth_chart()
     
-    # Generate predictions based on current transits
-    predictions_data = generate_predictions(today, chart_data)
+    # Get current dasha for personalized predictions
+    current_dasha = chart_data['current_dasha']
+    dasha_influence = ""
+    if current_dasha:
+        dasha_interp = get_dasha_interpretation(current_dasha['lord'])
+        dasha_influence = f"During this {current_dasha['lord']} Mahadasha, {dasha_interp['theme'].lower()} influences your path."
+    
+    # Generate predictions based on current transits and dasha
+    predictions_data = generate_predictions(today, chart_data, dasha_influence)
     
     context = {
         'predictions': predictions_data,
         'today': today,
+        'current_dasha': current_dasha,
     }
     return render(request, 'astro/predictions.html', context)
 
 
-def generate_predictions(today, chart_data):
-    """Generate 90-day predictions based on planetary positions and transits"""
+def generate_predictions(today, chart_data, dasha_influence=""):
+    """Generate 90-day predictions based on planetary transits and dasha"""
     predictions = []
     
     # Get current planetary positions
@@ -490,7 +775,7 @@ def generate_predictions(today, chart_data):
         'period': 'Next 30 Days',
         'focus': 'Career',
         'intensity': career_intensity,
-        'description': generate_career_description(career_score, career_factors),
+        'description': generate_career_description(career_score, career_factors, dasha_influence),
         'recommendation': generate_career_recommendation(career_intensity),
         'dates': f"{today.strftime('%d %b')} - {(today + timedelta(days=30)).strftime('%d %b')}",
     })
@@ -511,7 +796,7 @@ def generate_predictions(today, chart_data):
         'period': 'Days 30-60',
         'focus': 'Relationships',
         'intensity': rel_intensity,
-        'description': generate_relationship_description(relationship_score),
+        'description': generate_relationship_description(relationship_score, dasha_influence),
         'recommendation': 'Practice active listening. Express appreciation for loved ones. Be patient with family matters.',
         'dates': f"{(today + timedelta(days=30)).strftime('%d %b')} - {(today + timedelta(days=60)).strftime('%d %b')}",
     })
@@ -535,7 +820,7 @@ def generate_predictions(today, chart_data):
         'period': 'Days 60-90',
         'focus': 'Health',
         'intensity': health_intensity,
-        'description': generate_health_description(health_intensity),
+        'description': generate_health_description(health_intensity, dasha_influence),
         'recommendation': 'Establish consistent sleep and exercise routines. Prioritize mental health through meditation or journaling.',
         'dates': f"{(today + timedelta(days=60)).strftime('%d %b')} - {(today + timedelta(days=90)).strftime('%d %b')}",
     })
@@ -543,14 +828,20 @@ def generate_predictions(today, chart_data):
     return predictions
 
 
-def generate_career_description(score, factors):
+def generate_career_description(score, factors, dasha_influence=""):
     """Generate career prediction description"""
+    base_desc = ""
     if score >= 20:
-        return "Jupiter aspects your 10th house, bringing opportunities for professional growth. This is a favorable time for initiating new projects and seeking recognition." + (f" {factors[0]}" if factors else "")
+        base_desc = "Jupiter aspects your 10th house, bringing opportunities for professional growth. This is a favorable time for initiating new projects and seeking recognition."
     elif score >= 10:
-        return "Steady progress in career matters. Focus on building foundations and demonstrating reliability."
+        base_desc = "Steady progress in career matters. Focus on building foundations and demonstrating reliability."
     else:
-        return "A period for introspection regarding career direction. Avoid major decisions and focus on skill development."
+        base_desc = "A period for introspection regarding career direction. Avoid major decisions and focus on skill development."
+    
+    if dasha_influence:
+        base_desc = f"{dasha_influence} {base_desc}"
+    
+    return base_desc
 
 
 def generate_career_recommendation(intensity):
@@ -563,7 +854,7 @@ def generate_career_recommendation(intensity):
         return "Focus on skill development and learning. Avoid major career changes during this period."
 
 
-def generate_relationship_description(score):
+def generate_relationship_description(score, dasha_influence=""):
     """Generate relationship prediction description"""
     if score >= 15:
         return "Venus transits bring focus on partnerships. A time for deepening existing connections and healing past misunderstandings."
@@ -571,7 +862,7 @@ def generate_relationship_description(score):
         return "Stable period for relationships. Focus on communication and understanding."
 
 
-def generate_health_description(intensity):
+def generate_health_description(intensity, dasha_influence=""):
     """Generate health prediction description"""
     if intensity == 'challenging':
         return "Saturn influence suggests the need for discipline in health routines. Minor stress-related issues may arise."
