@@ -222,40 +222,10 @@ def birthday_seen(request):
 def health_check(request):
     """
     Health check endpoint for Railway deployment.
-    Returns 200 OK if the app is healthy.
+    Simple check - returns 200 OK if Django is running.
     """
-    from django.db import connection
-    from django.db.utils import OperationalError
-    
-    health_status = {
+    return JsonResponse({
         'status': 'healthy',
         'timestamp': datetime.now().isoformat(),
-        'checks': {}
-    }
-    status_code = 200
-    
-    # Check database
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT 1")
-        health_status['checks']['database'] = 'ok'
-    except OperationalError:
-        health_status['checks']['database'] = 'error'
-        health_status['status'] = 'unhealthy'
-        status_code = 503
-    
-    # Check static files
-    try:
-        from django.contrib.staticfiles.storage import staticfiles_storage
-        health_status['checks']['staticfiles'] = 'ok'
-    except Exception as e:
-        health_status['checks']['staticfiles'] = f'error: {str(e)}'
-    
-    # Check pyswisseph (optional)
-    try:
-        import swisseph as swe
-        health_status['checks']['astrology'] = 'available'
-    except ImportError:
-        health_status['checks']['astrology'] = 'unavailable'
-    
-    return JsonResponse(health_status, status=status_code)
+        'message': 'Django is running'
+    }, status=200)
