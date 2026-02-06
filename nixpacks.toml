@@ -1,10 +1,29 @@
 # Nixpacks configuration for Railway
-# Required system libraries for pyswisseph
+# This configures how Railway builds the app
 
-# Install apt packages during the setup phase (before Python install)
+# Specify Python version explicitly
 [phases.setup]
+nixPkgs = ["python311", "postgresql_16.dev", "gcc", "libsqlite3-dev", "sqlite3", "libsqlite3-0"]
 aptPackages = ["libsqlite3-dev", "sqlite3", "libsqlite3-0"]
 
 # Ensure pyswisseph can find the SQLite library
 [variables]
 LD_LIBRARY_PATH = "/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
+PYTHON_VERSION = "3.11.0"
+
+# Install phase
+[phases.install]
+cmds = [
+    "python -m venv --copies /opt/venv",
+    ". /opt/venv/bin/activate",
+    "pip install --upgrade pip",
+    "pip install -r requirements.txt"
+]
+
+# Build phase
+[phases.build]
+cmds = ["echo 'Build phase complete'"]
+
+# Start command
+[start]
+cmd = "bash railway_startup.sh"
