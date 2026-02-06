@@ -23,7 +23,7 @@ Profile → Change Password
 
 ```bash
 # Required Core Settings
-GEMINI_API_KEY=AQ.Ab8RN6IlEpIUJQj7WQH-d6kECcU3Fv2DV_9n_YT5GNX5itro_A
+GEMINI_API_KEY=your-gemini-api-key-here
 GEMINI_MODEL=gemini-pro
 SECRET_KEY=your-random-secret-key-here-min-50-chars
 DEBUG=False
