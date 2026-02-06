@@ -8,6 +8,8 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib.auth.forms import PasswordChangeForm
+from django.utils import timezone
+import pytz
 from .models import DailyThought, UserProfile
 
 
@@ -142,9 +144,14 @@ def dashboard(request):
     active_goals = Goal.objects.filter(user=request.user, status='active').count()
     pending_tasks = Task.objects.filter(goal__user=request.user, status='pending').count()
     
-    # Check if today is February 6 (Jayti's Birthday) - Show Vivek's message only on birthday
-    today = datetime.now()
-    is_birthday = (today.month == 2 and today.day == 6)
+    # Check if today is February 6 (Jayti's Birthday) in Indian Standard Time (IST)
+    # Using IST ensures the birthday message appears at midnight India time, not UTC
+    now_utc = timezone.now()
+    ist_tz = pytz.timezone('Asia/Kolkata')
+    today_ist = now_utc.astimezone(ist_tz)
+    
+    is_birthday = (today_ist.month == 2 and today_ist.day == 6)
+    jayti_age = today_ist.year - 1997
     
     # Only show the message on her birthday (Feb 6) each year
     # This makes it special rather than a daily interruption
@@ -157,7 +164,7 @@ def dashboard(request):
         'pending_tasks': pending_tasks,
         'show_vivek_message': show_vivek_message,
         'is_birthday': is_birthday,
-        'jayti_age': today.year - 1997,
+        'jayti_age': jayti_age,
     }
     
     return render(request, 'core/dashboard.html', context)
