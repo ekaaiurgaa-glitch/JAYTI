@@ -40,6 +40,5 @@ jobs:
       - name: Verify Build
         run: |
           pip install -r requirements.txt
-          cd jaytipargal
           python manage.py check --settings=jaytipargal.settings
           echo "✅ Build verified - Ready for manual deployment to Railway"
