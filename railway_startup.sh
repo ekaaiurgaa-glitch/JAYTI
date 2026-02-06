@@ -2,7 +2,8 @@
 # Railway Startup Script with Debugging
 # This script runs when Railway deploys your app
 
-set -e  # Exit on error
+# Don't exit on error - we want to see all errors
+set +e
 
 echo "=========================================="
 echo "  RAILWAY DEPLOYMENT STARTUP SCRIPT"
@@ -15,9 +16,10 @@ PIP=/opt/venv/bin/pip
 # Debug: Print environment info
 echo ""
 echo "📋 Environment Info:"
-echo "  Python Version: $($PYTHON --version)"
+echo "  Python Version: $($PYTHON --version 2>&1)"
 echo "  Working Directory: $(pwd)"
 echo "  PATH: $PATH"
+echo "  PORT: ${PORT:-'not set'}"
 
 # Debug: Check for critical files
 echo ""
@@ -26,6 +28,7 @@ if [ -f "manage.py" ]; then
     echo "  ✓ manage.py found"
 else
     echo "  ✗ manage.py NOT FOUND!"
+    ls -la
     exit 1
 fi
 
@@ -40,53 +43,76 @@ fi
 echo ""
 echo "🔐 Checking Environment Variables:"
 if [ -n "$SECRET_KEY" ]; then
-    echo "  ✓ SECRET_KEY is set"
+    echo "  ✓ SECRET_KEY is set (length: ${#SECRET_KEY})"
 else
-    echo "  ⚠ SECRET_KEY is NOT set (will use default)"
+    echo "  ⚠ SECRET_KEY is NOT set"
 fi
 
 if [ -n "$DATABASE_URL" ]; then
     echo "  ✓ DATABASE_URL is set"
 else
-    echo "  ⚠ DATABASE_URL is NOT set (will use SQLite)"
+    echo "  ⚠ DATABASE_URL is NOT set"
 fi
 
 if [ -n "$GEMINI_API_KEY" ]; then
     echo "  ✓ GEMINI_API_KEY is set"
 else
-    echo "  ⚠ GEMINI_API_KEY is NOT set (AI chat will not work)"
+    echo "  ⚠ GEMINI_API_KEY is NOT set"
+fi
+
+# Test Django import first
+echo ""
+echo "🐍 Testing Django Import..."
+$PYTHON -c "import django; print(f'  ✓ Django {django.get_version()} imported')" 2>&1
+if [ $? -ne 0 ]; then
+    echo "  ✗ Django import failed!"
+    exit 1
+fi
+
+# Test settings import
+echo ""
+echo "⚙️  Testing Settings Import..."
+$PYTHON -c "import jaytipargal.settings; print('  ✓ Settings imported')" 2>&1
+if [ $? -ne 0 ]; then
+    echo "  ✗ Settings import failed!"
+    $PYTHON -c "import jaytipargal.settings" 2>&1
+    exit 1
 fi
 
 # Run Railway Debugger
 echo ""
 echo "🔍 Running Railway Deployment Debugger..."
-$PYTHON manage.py railway_debug || {
+$PYTHON manage.py railway_debug 2>&1
+if [ $? -ne 0 ]; then
     echo ""
     echo "❌ Deployment checks failed! See errors above."
     exit 1
-}
+fi
 
 # Collect static files
 echo ""
 echo "📦 Collecting Static Files..."
-$PYTHON manage.py collectstatic --noinput --clear || {
+$PYTHON manage.py collectstatic --noinput --clear 2>&1
+if [ $? -ne 0 ]; then
     echo "⚠ Static collection had issues, continuing..."
-}
+fi
 
 # Run migrations
 echo ""
 echo "🗄️  Running Database Migrations..."
-$PYTHON manage.py migrate --noinput || {
+$PYTHON manage.py migrate --noinput 2>&1
+if [ $? -ne 0 ]; then
     echo "❌ Migration failed!"
     exit 1
-}
+fi
 
 # Create initial user if needed
 echo ""
 echo "👤 Creating Initial User..."
-$PYTHON manage.py create_initial_user || {
+$PYTHON manage.py create_initial_user 2>&1
+if [ $? -ne 0 ]; then
     echo "⚠ Initial user creation had issues, continuing..."
-}
+fi
 
 # Final startup message
 echo ""
