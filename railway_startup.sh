@@ -95,9 +95,17 @@ echo "  ✅ STARTUP COMPLETE - LAUNCHING APP"
 echo "=========================================="
 echo ""
 
+# Ensure PORT is set (Railway should set this automatically)
+if [ -z "$PORT" ]; then
+    echo "⚠️  PORT not set, using default 8080"
+    PORT=8080
+fi
+
+echo "🌐 Starting Gunicorn on port $PORT"
+
 # Start Gunicorn with logging
 exec $PYTHON -m gunicorn jaytipargal.wsgi:application \
-    --bind 0.0.0.0:$PORT \
+    --bind "0.0.0.0:$PORT" \
     --workers 2 \
     --threads 4 \
     --worker-class gthread \
