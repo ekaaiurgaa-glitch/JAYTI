@@ -16,18 +16,24 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
+            name='Tag',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=50, unique=True)),
+                ('color', models.CharField(default='#F4C2C2', max_length=7)),
+            ],
+        ),
+        migrations.CreateModel(
             name='Note',
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('title', models.CharField(max_length=200)),
-                ('content', models.TextField()),
-                ('content_html', models.TextField(blank=True)),
-                ('category', models.CharField(blank=True, choices=[('personal', 'Personal'), ('work', 'Work'), ('ideas', 'Ideas'), ('quotes', 'Quotes'), ('other', 'Other')], max_length=20)),
-                ('is_pinned', models.BooleanField(default=False)),
-                ('is_archived', models.BooleanField(default=False)),
-                ('color', models.CharField(blank=True, max_length=20)),
+                ('title', models.CharField(blank=True, max_length=200)),
+                ('content', models.TextField(blank=True)),
+                ('content_plain', models.TextField(blank=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('modified_at', models.DateTimeField(auto_now=True)),
+                ('is_pinned', models.BooleanField(default=False)),
+                ('tags', models.ManyToManyField(blank=True, related_name='notes', to='notes.tag')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='notes', to=settings.AUTH_USER_MODEL)),
             ],
             options={
