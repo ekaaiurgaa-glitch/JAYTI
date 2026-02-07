@@ -19,20 +19,30 @@ fi
 
 echo "Python: $PYTHON"
 $PYTHON --version
-echo "PWD: $(pwd)"
-ls -la
 
 echo ""
 echo "📦 Installing dependencies..."
-pip install -r requirements.txt 2>&1 | tail -5
+pip install -r requirements.txt 2>&1 | tail -3
 
 echo ""
 echo "📦 Collecting static files..."
 $PYTHON manage.py collectstatic --noinput 2>&1 || echo "Static warning"
 
 echo ""
+echo "🗄️ Checking migrations..."
+$PYTHON manage.py showmigrations 2>&1 || echo "Could not show migrations"
+
+echo ""
 echo "🗄️ Running database migrations..."
 $PYTHON manage.py migrate --noinput 2>&1
+if [ $? -ne 0 ]; then
+    echo "⚠️  Migration failed, trying with --run-syncdb..."
+    $PYTHON manage.py migrate --run-syncdb --noinput 2>&1
+fi
+
+echo ""
+echo "🗄️ Creating missing tables..."
+$PYTHON manage.py migrate --fake-initial --noinput 2>&1 || echo "Fake initial skipped"
 
 echo ""
 echo "👤 Creating initial user..."
