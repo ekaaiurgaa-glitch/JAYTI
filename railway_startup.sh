@@ -1,6 +1,5 @@
 #!/bin/bash
 # Railway Startup Script for JAYTI Birthday App
-# This runs at DEPLOY time, not build time
 
 set -e
 
@@ -20,28 +19,32 @@ fi
 
 echo "Python: $PYTHON"
 $PYTHON --version
+echo "PWD: $(pwd)"
+ls -la
+
+echo ""
+echo "📦 Installing dependencies..."
+pip install -r requirements.txt 2>&1 | tail -5
 
 echo ""
 echo "📦 Collecting static files..."
-$PYTHON manage.py collectstatic --noinput || echo "Static warning (non-fatal)"
+$PYTHON manage.py collectstatic --noinput 2>&1 || echo "Static warning"
 
 echo ""
 echo "🗄️ Running database migrations..."
-$PYTHON manage.py migrate --noinput || {
-    echo "Migration failed!"
-    exit 1
-}
+$PYTHON manage.py migrate --noinput 2>&1
 
 echo ""
 echo "👤 Creating initial user..."
-$PYTHON manage.py create_initial_user || echo "User creation skipped"
+$PYTHON manage.py create_initial_user 2>&1 || echo "User exists"
 
 echo ""
 echo "========================================"
-echo "  STARTING SERVER"
+echo "  STARTING SERVER on port $PORT"
 echo "========================================"
 
 exec $PYTHON -m gunicorn jaytipargal.wsgi:application \
     --bind "0.0.0.0:$PORT" \
     --workers 2 \
-    --timeout 120
+    --timeout 120 \
+    --log-level info
