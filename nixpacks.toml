@@ -1,22 +1,18 @@
-# Nixpacks configuration for Railway
-# Django app with manage.py at root level
-
 [phases.setup]
-nixPkgs = ["python311", "postgresql_16.dev"]
-
-[phases.install]
-cmds = [
-    "python3.11 -m venv --copies /opt/venv",
-    ". /opt/venv/bin/activate",
-    "pip install --upgrade pip",
-    "pip install -r requirements.txt"
-]
+nixPkgs = ['python311', 'python311Packages.pip', 'postgresql', 'gcc']
 
 [phases.build]
 cmds = [
-    ". /opt/venv/bin/activate",
-    "echo 'Build complete - manage.py at root level'"
+    'python -m venv /opt/venv',
+    '/opt/venv/bin/pip install --upgrade pip setuptools wheel',
+    '/opt/venv/bin/pip install -r requirements.txt'
 ]
 
-[start]
-cmd = "/bin/bash railway_startup.sh"
+[phases.start]
+cmds = ['bash railway_startup.sh']
+
+[env]
+PYTHON_VERSION = "3.11"
+PIP_DISABLE_PIP_VERSION_CHECK = "1"
+PYTHONDONTWRITEBYTECODE = "1"
+PYTHONUNBUFFERED = "1"

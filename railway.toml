@@ -1,20 +1,13 @@
-# Railway Deployment Configuration
-
 [build]
-builder = "nixpacks"
+builder = "NIXPACKS"
+buildCommand = "echo 'Build complete'"
 
 [deploy]
-# Use absolute path to ensure correct directory
-startCommand = "/bin/bash railway_startup.sh"
-
-# Health check endpoint
+startCommand = "bash railway_startup.sh"
 healthcheckPath = "/health/"
 healthcheckTimeout = 300
-
-# Deployment behavior
-restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 5
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
 
 [deploy.env]
-RAILWAY_DEBUG = "true"
-PYTHONUNBUFFERED = "1"
+PYTHON_VERSION = "3.11"

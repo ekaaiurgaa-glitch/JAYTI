@@ -1,98 +1,71 @@
 #!/bin/bash
-# Railway Startup Script - Root Directory Version
-# This script runs from the repository root where manage.py is located
+# Railway Startup Script for JAYTI Birthday App
+# Handles database migrations, static files, and user creation
 
-set +e  # Don't exit on errors
+set -e  # Exit on error
 
-echo "=========================================="
-echo " RAILWAY DEPLOYMENT STARTUP"
-echo "=========================================="
-echo "Working directory: $(pwd)"
-echo "Listing files:"
-ls -la
+echo "========================================"
+echo "  JAYTI RAILWAY DEPLOYMENT STARTUP"
+echo "========================================"
 
+# Set Python path
 PYTHON=/opt/venv/bin/python
 
-# Basic checks
 echo ""
-echo "📁 Checking Files..."
-if [ ! -f "manage.py" ]; then
-    echo "❌ manage.py not found in $(pwd)!"
-    echo "Searching for manage.py..."
-    find / -name "manage.py" -type f 2>/dev/null | head -5
-    exit 1
-fi
-echo "✓ manage.py found"
+echo "📦 Step 1: Collecting static files..."
+$PYTHON manage.py collectstatic --noinput --clear 2>&1 || {
+    echo "⚠️  Static collection warning (non-fatal)"
+}
 
-echo "✓ Python: $($PYTHON --version 2>&1)"
-
-# Check environment variables
 echo ""
-echo "🔐 Environment Check:"
-if [ -n "$SECRET_KEY" ]; then
-    echo "✓ SECRET_KEY set"
-else
-    echo "⚠️  WARNING: SECRET_KEY not set"
-fi
-
-if [ -n "$DATABASE_URL" ]; then
-    echo "✓ DATABASE_URL set"
-else
-    echo "⚠️  WARNING: DATABASE_URL not set"
-fi
-
-if [ -n "$GEMINI_API_KEY" ]; then
-    echo "✓ GEMINI_API_KEY set"
-else
-    echo "⚠️  WARNING: GEMINI_API_KEY not set"
-fi
-
-# Test Django imports
-echo ""
-echo "🐍 Testing Django..."
-$PYTHON -c "import django; print(f'✓ Django {django.get_version()}')" || {
-    echo "❌ Django import failed"
+echo "🗄️  Step 2: Running database migrations..."
+$PYTHON manage.py migrate --noinput 2>&1 || {
+    echo "❌ Migration failed! Attempting to diagnose..."
+    $PYTHON manage.py showmigrations 2>&1 || echo "Cannot show migrations"
     exit 1
 }
 
-$PYTHON -c "import jaytipargal.settings; print('✓ Settings loaded')" || {
-    echo "❌ Settings import failed"
-    exit 1
+echo ""
+echo "✅ Step 3: Verifying database connection..."
+$PYTHON -c "
+from django.db import connection
+with connection.cursor() as cursor:
+    cursor.execute('SELECT COUNT(*) FROM auth_user;')
+    count = cursor.fetchone()[0]
+    print(f'   Database connected. Users in database: {count}')
+" 2>&1 || echo "⚠️  Could not verify user count"
+
+echo ""
+echo "👤 Step 4: Creating initial user (if needed)..."
+$PYTHON manage.py create_initial_user 2>&1 || {
+    echo "⚠️  User creation warning (may already exist)"
 }
 
-# Collect static files
 echo ""
-echo "📦 Collecting Static Files..."
-$PYTHON manage.py collectstatic --noinput 2>&1 || echo "⚠️  Static collection warning"
+echo "🔧 Step 5: Running deployment diagnostics..."
+$PYTHON manage.py railway_debug 2>&1 || {
+    echo "⚠️  Debug command not available (OK if new deployment)"
+}
 
-# Run migrations
 echo ""
-echo "🗄️ Running Migrations..."
-$PYTHON manage.py migrate --noinput 2>&1 || echo "⚠️  Migration warning"
-
-# Create initial user
+echo "========================================"
+echo "  STARTING GUNICORN SERVER"
+echo "========================================"
+echo "Port: $PORT"
+echo "Workers: 2"
 echo ""
-echo "👤 Creating Initial User..."
-$PYTHON manage.py create_initial_user 2>&1 || echo "⚠️  User creation skipped"
 
-# Start server
-echo ""
-echo "=========================================="
-echo " 🚀 STARTING GUNICORN ON PORT ${PORT:-8080}"
-echo "=========================================="
-
-if [ -z "$PORT" ]; then
-    PORT=8080
-fi
-
-# Use exec to replace shell with gunicorn
+# Start Gunicorn
 exec $PYTHON -m gunicorn jaytipargal.wsgi:application \
     --bind "0.0.0.0:$PORT" \
     --workers 2 \
-    --threads 4 \
+    --threads 2 \
     --worker-class gthread \
     --timeout 120 \
     --keep-alive 5 \
+    --max-requests 1000 \
+    --max-requests-jitter 50 \
     --access-logfile - \
     --error-logfile - \
-    --log-level info
+    --capture-output \
+    --enable-stdio-inheritance
